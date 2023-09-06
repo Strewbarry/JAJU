@@ -32,12 +32,15 @@ class local_path_pub :
 
         #TODO: (2) Local Path publisher 선언
         # local Path 데이터를 Publish 하는 변수를 선언한다.
-        self.local_path_pub = rospy.Publisher('/local_path',Path, queue_size=1)
+        self.local_path_pub = rospy.Publisher('/local_path',Path, queue_size=100)
 
         
         # 초기화
-        self.is_odom = False
-        self.is_path = False
+        self.global_path_msg = Path()
+        self.global_path_msg.header.frame_id = '/map'
+        self.is_status = False
+        self.x = 0
+        self.y = 0
 
         #TODO: (3) Local Path 의 Size 결정
 
@@ -50,7 +53,7 @@ class local_path_pub :
         rate = rospy.Rate(20) # 20hz
         while not rospy.is_shutdown():
    
-            if self.is_odom == True and self.is_path == True:
+            if self.is_status == True:
                 local_path_msg=Path()
                 local_path_msg.header.frame_id='/map'
                 
@@ -66,7 +69,6 @@ class local_path_pub :
                 min_dis = float('inf')
                 current_waypoint = -1
                 for i,waypoint in enumerate(self.global_path_msg.poses) :
-
                     distance=sqrt(pow(x-waypoint.pose.position.x,2)+pow(y-waypoint.pose.position.y,2))
                     if distance < min_dis :
                         min_dis=distance
@@ -100,10 +102,12 @@ class local_path_pub :
                 # Local Path 메세지 를 전송하는 publisher 를 만든다.
                 self.local_path_pub.publish(local_path_msg)
 
+
+
             rate.sleep()
 
     def odom_callback(self,msg):
-        self.is_odom = True
+        self.is_status = True
         #TODO: (4) 콜백함수에서 처음 메시지가 들어오면 초기 위치를 저장
 
 
@@ -114,7 +118,6 @@ class local_path_pub :
 
 
     def global_path_callback(self,msg):
-        self.is_path = True
         self.global_path_msg = msg        
 
 if __name__ == '__main__':

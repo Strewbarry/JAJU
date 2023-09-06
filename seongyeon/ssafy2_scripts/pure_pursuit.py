@@ -43,7 +43,7 @@ class pure_pursuit :
         # CtrlCmd 은 1장을 참고 한다.
         rospy.Subscriber("local_path",Path, self.path_callback )
         rospy.Subscriber("odom", Odometry, self.odom_callback )
-        self.ctrl_cmd_pub = rospy.Publisher('ctrl_cmd',CtrlCmd, queue_size=1)
+        self.ctrl_cmd_pub = rospy.Publisher('ctrl_cmd',CtrlCmd, queue_size=100)
         self.ctrl_cmd_msg=CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType=2
 
@@ -55,8 +55,8 @@ class pure_pursuit :
         self.forward_point=Point()
         self.current_postion=Point()
 
-        self.vehicle_length = 1
-        self.lfd = 1
+        self.vehicle_length = 2.7
+        self.lfd = 5
 
         rate = rospy.Rate(30) # 30hz
         while not rospy.is_shutdown():
@@ -113,7 +113,9 @@ class pure_pursuit :
                         [sin(self.vehicle_yaw),cos(self.vehicle_yaw),translation[1]],
                         [0                    ,0                    ,1            ]])
 
-        det_trans_matrix = np.linalg.inv(trans_matrix)
+        det_trans_matrix = np.array([[trans_matrix[0][0], trans_matrix[1][0], -(trans_matrix[0][0] * translation[0] + trans_matrix[1][0] * translation[1])],
+                                     [trans_matrix[0][1], trans_matrix[1][1], -(trans_matrix[0][1] * translation[0] + trans_matrix[1][1] * translation[1])],
+                                     [0, 0, 1]])
 
         for num,i in enumerate(self.path.poses) :
             path_point = i.pose.position
@@ -136,7 +138,8 @@ class pure_pursuit :
         # Steering 각도는 Pure Pursuit 알고리즘의 각도 계산 수식을 적용하여 조향 각도를 계산합니다.
         theta = atan2(local_path_point[1],local_path_point[0])
         steering = atan2(2.0 * self.vehicle_length * sin(theta), self.lfd)
-
+        print(local_path_point[0], local_path_point[1])
+        print(theta, steering)
 
 
         return steering

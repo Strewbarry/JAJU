@@ -25,7 +25,7 @@ class global_path_pub :
 
         # Global Path 데이터를 Publish 하는 변수와 메세지를 담고있는 변수를 선언한다.
         # 이때 Global Path 는 map 좌표계를 기준으로 생성한다.
-        self.global_path_pub = rospy.Publisher('/global_path',Path, queue_size=1)
+        self.global_path_pub = rospy.Publisher('/global_path',Path, queue_size=100)
         self.global_path_msg = Path()
         self.global_path_msg.header.frame_id = '/map'
 

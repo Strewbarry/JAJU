@@ -74,7 +74,8 @@ class pure_pursuit :
         self.lfd = 8
         self.min_lfd = 5
         self.max_lfd = 30
-        self.lfd_gain = 0.78
+        # self.lfd_gain = 0.78
+        self.lfd_gain = 0.9
         self.target_velocity = 60
 
         self.pid = pidControl()

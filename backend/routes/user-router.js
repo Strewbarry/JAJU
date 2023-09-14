@@ -10,6 +10,8 @@ router.post('/idcheck', userLogic.idcheck)
 router.put('/update', userLogic.update)
 // 회원 탈퇴
 router.delete('/delete/:id', userLogic.delete)
+// 예약 정보 조회
+router.get('/reservation/:id', userLogic.get_reservation)
 
 
 

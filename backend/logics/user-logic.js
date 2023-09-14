@@ -61,3 +61,15 @@ exports.delete = async (req, res) => {
         res.status(200).json(results)
     })
 }
+
+exports.get_reservation = async (req, res) => {
+    const user_id = req.params.id
+
+    const sql = 'SELECT * FROM reservation WHERE (`user_id` = ?);'
+    const params = [user_id]
+    connection.query(sql, params, function(error, results, fields) {
+        if (error) throw error
+
+        res.status(200).json(results)
+    })
+}

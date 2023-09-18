@@ -44,13 +44,9 @@ class Cluster_viz:
             if self.is_odom == True and self.cluster_status == True:
 
                 #TODO: (1) 좌표 변환 행렬 생성
-                '''
-                trans_matrix = np.array([
-                                            [       ,       ,       ],
-                                            [       ,       ,       ],
-                                            [0,0,1]])
-
-                '''
+                trans_matrix = np.array([[math.cos(self.vehicle_yaw), -math.sin(self.vehicle_yaw), self.vehicle_pos_x], 
+                                         [math.sin(self.vehicle_yaw), math.cos(self.vehicle_yaw), self.vehicle_pos_y], 
+                                         [0,0,1]])
                 obj_data=PointCloud()
                 obj_data.header.frame_id='map'
 
@@ -62,31 +58,28 @@ class Cluster_viz:
                 for num,i in enumerate(self.cluster_data.poses) :
 
                     #TODO: (2) PointCloud와 ObjectStatus 형식에 맞춘 메시지 데이터 생성
-                    '''
-                    local_result = 
-                    global_result = 
+                    local_result = np.dot(trans_matrix, [i.position.x, i.position.y, 1])
+                    global_result = np.dot(np.linalg.inv(trans_matrix), [i.position.x, i.position.y, 1])
 
                     tmp_point=Point32()
-                    tmp_point.x = 
-                    tmp_point.y = 
+                    tmp_point.x = global_result[0]
+                    tmp_point.y = global_result[1]
                     tmp_point.z = 1.
                     obj_data.points.append(tmp_point)
 
                     cluster_obj_data_npc = ObjectStatus()
                     cluster_obj_data_npc.type = 1
-                    cluster_obj_data_npc.position.x = 
-                    cluster_obj_data_npc.position.y = 
+                    cluster_obj_data_npc.position.x = local_result[0]
+                    cluster_obj_data_npc.position.y = local_result[1]
                     cluster_obj_data_npc.position.z = 1.
                     cluster_obj_data.npc_list.append(cluster_obj_data_npc)
 
                     cluster_obj_data_obstacle = ObjectStatus()
                     cluster_obj_data_obstacle.type = 2
-                    cluster_obj_data_obstacle.position.x = 
-                    cluster_obj_data_obstacle.position.y = 
+                    cluster_obj_data_obstacle.position.x = local_result[0]
+                    cluster_obj_data_obstacle.position.y = local_result[1]
                     cluster_obj_data_obstacle.position.z = 1.
                     cluster_obj_data.obstacle_list.append(cluster_obj_data_obstacle)
-
-                    '''
 
                 #TODO: (3) 3. PointCloud와 ObjectStatus 메시지 송신
 

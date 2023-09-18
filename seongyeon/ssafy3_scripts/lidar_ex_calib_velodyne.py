@@ -31,37 +31,37 @@ from numpy.linalg import inv
 # 5. PointCloud가 Image에 투영된 Processed Image 시각화
 
 #TODO: (1) Camera, LiDAR의 설치 좌표, Camera Parameter 입력
-'''
+
 # 시뮬레이터에서 설치한 Camera와 LiDAR의 정보를 입력하는 영역입니다.
 # 차량 뒷축 중심을 기준으로 설치된 센서들의 위치를 입력해줍니다. (X,Y,Z,Roll,Pitch,Yaw)
 # Roll, Pitch, Yaw 입력 시에는 Radian 값으로 변환하여 입력해주어야 합니다.
 # Camera는 추가로 Width, Height, Horizontal FOV 값을 입력합니다.
 
 parameters_cam = {
-    "WIDTH": , # image width
-    "HEIGHT": , # image height
-    "FOV": , # Field of view
-    "X": , # meter
-    "Y": ,
-    "Z": ,
-    "YAW": , # radian    
-    "PITCH": ,
-    "ROLL": 
+    "WIDTH": 640, # image width
+    "HEIGHT": 480, # image height
+    "FOV": 90, # Field of view
+    "X": 3.42, # meter
+    "Y": 0,
+    "Z": 0.5,
+    "YAW": 0, # radian    
+    "PITCH": 0,
+    "ROLL": 0
 }
 
 parameters_lidar = {
-    "X": , # meter
-    "Y": ,
-    "Z": ,
-    "YAW": , # radian
-    "PITCH": ,
-    "ROLL": 
+    "X": 0.7, # meter
+    "Y": 0,
+    "Z": 1.44,
+    "YAW": 0, # radian
+    "PITCH": 0,
+    "ROLL": 0
 }
-'''
+
 
 def getRotMat(RPY):        
     #TODO: (2.1.1) Rotation Matrix 계산 함수 구현
-    '''    
+   
     # Rotation Matrix를 계산하는 영역입니다.
     # 각 회전에 대한 Rotation Matrix를 계산하면 됩니다.
     # Input
@@ -77,17 +77,17 @@ def getRotMat(RPY):
     sinP = math.sin(RPY[1])
     sinY = math.sin(RPY[2])
     
-    rotRoll = 
-    rotPitch = 
-    rotYaw = 
+    rotRoll = np.array([1,0,0, 0,cosR,-sinR, 0,sinR,cosR]).reshape(3,3)
+    rotPitch = np.array([cosP,0,sinP, 0,1,0, -sinP,0,cosP]).reshape(3,3)
+    rotYaw = np.array([cosY,-sinY,0, sinY,cosY,0, 0,0,1]).reshape(3,3)
 
     rotMat = rotYaw.dot(rotPitch.dot(rotRoll))    
     return rotMat
-    '''
+
 
 def getSensorToVehicleMat(sensorRPY, sensorPosition):
     #TODO: (2.1.2) Transformation Matrix 계산 함수 구현
-    '''
+
     # Sensor To Vehicle Transformation Matrix를 계산하는 영역입니다.
     # 위에서 구현한 getRotMat 함수를 이용해 Rotation Matrix를 구하고
     # sensorPosition 정보를 활용하여 Translation Matrix를 구해
@@ -104,7 +104,7 @@ def getSensorToVehicleMat(sensorRPY, sensorPosition):
     Tr_sensor_to_vehicle = 
     
     return Tr_sensor_to_vehicle
-    '''
+
     
 def getLiDARTOCameraTransformMat(camRPY, camPosition, lidarRPY, lidarPosition):
     #TODO: (2.2) LiDAR to Camera Transformation Matrix 계산

@@ -82,6 +82,7 @@ class GPSIMUParser:
         self.lon = gps_msg.longitude
         self.e_o = gps_msg.eastOffset
         self.n_o = gps_msg.northOffset
+        print(gps_msg.eastOffset, gps_msg.northOffset)
 
         self.is_gps=True
 

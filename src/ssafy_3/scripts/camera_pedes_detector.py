@@ -46,20 +46,20 @@ def non_maximum_supression(bboxes, threshold=0.3):
             y2_br = new_bbox[1] + new_bbox[3]
 
             #TODO: (7)  IOU 계산
-            '''
-            이미지의 IoU를 계산하는 영역입니다.
-            위에 입력된 파라미터를 이용하여 IoU를 계산 해 보시기 바랍니다.
-            x_overlap =
-            y_overlap =
-            overlap_area =
-            
-            area_1 =
-            area_2 =
-            
-            total_area =
 
-            overlap_area =
-            '''
+            #이미지의 IoU를 계산하는 영역입니다.
+            #위에 입력된 파라미터를 이용하여 IoU를 계산 해 보시기 바랍니다.
+            x_overlap = max(0, min(x1_br, x2_br)-max(x1_tl, x2_tl))
+            y_overlap = max(0, min(y1_br, y2_br)-max(y1_tl, y2_tl))
+            overlap_area = x_overlap * y_overlap
+            
+            area_1 = bbox[2] * new_bbox[3]
+            area_2 = new_bbox[2] * new_bbox[3]
+            
+            total_area = area_1 + area_2 - overlap_area
+
+            overlap_area = overlap_area / float(total_area)
+
             if overlap_area < threshold:
                 
                 new_bboxes.append(bbox)
@@ -77,7 +77,7 @@ class PEDESDetector:
             CompressedImage,
             self.callback)
 
-        self.rate = rospy.Rate(20)
+        self.rate = rospy.Rate(30)
 
         #TODO: (2) HOG descitpor 생성
         self.pedes_detector = cv2.HOGDescriptor()   
@@ -99,7 +99,7 @@ class PEDESDetector:
         img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
 
         #TODO: (5)  검출 (paramter 바꿔가면서 설정)
-        (rects_temp, _) = self.pedes_detector.detectMultiScale(img_gray, winStride=(4, 4), padding=(2, 2), scale=32)
+        (rects_temp, _) = self.pedes_detector.detectMultiScale(img_gray, winStride=(8, 8), padding=(2, 2), scale=32)
         
         if len(rects_temp) != 0:
             

@@ -33,20 +33,20 @@ class IMGParser:
 
         rospy.Subscriber("odom", Odometry, self.odom_callback)
 
-        self.path_pub = rospy.Publisher('/lane_path', Path, queue_size=30)
+        self.path_pub = rospy.Publisher('/lane_path', Path, queue_size=100)
 
         self.img_bgr = None
         self.img_lane = None
         self.edges = None 
         self.is_status = False
 
-        self.lower_wlane = np.array([0,0,205])
-        self.upper_wlane = np.array([30,60,255])
+        self.lower_wlane = np.array([0, 10, 200])
+        self.upper_wlane = np.array([30, 50, 255])
 
-        self.lower_ylane = np.array([0,70,120])# ([0,60,100])
-        self.upper_ylane = np.array([40,195,230])# ([40,175,255])
+        self.lower_ylane = np.array([0, 120, 100])# ([0,60,100])
+        self.upper_ylane = np.array([40, 255, 255])# ([40,175,255])
 
-        self.crop_pts = np.array([[[0,480],[0,350],[280,200],[360,200],[640,350],[640,480]]])
+        self.crop_pts = np.array([[[0, 400], [240, 250], [400, 250], [640, 400]]])
 
         rospack = rospkg.RosPack()
         currentPath = rospack.get_path(pkg_name)
@@ -58,12 +58,12 @@ class IMGParser:
 
         bev_op = BEVTransform(params_cam=params_cam)
         #TODO: (1) CURVEFit Parameter 입력
-        '''
-        CURVEFit Class의 Parameter를 결정하는 영역입니다.
-        하단의 CURVEFit Class에 대한 정보를 바탕으로 적절한 Parameter를 입력하기 바랍니다.
 
-        curve_learner = CURVEFit(order=, lane_width= ,y_margin=, x_range=, min_pts=)
-        '''
+        #CURVEFit Class의 Parameter를 결정하는 영역입니다.
+        #하단의 CURVEFit Class에 대한 정보를 바탕으로 적절한 Parameter를 입력하기 바랍니다.
+
+        curve_learner = CURVEFit(order=3, alpha=10, lane_width=2, y_margin=0.5, x_range=40, dx=0.2, min_pts=80)
+
         #END
         rate = rospy.Rate(10)
 
@@ -378,27 +378,28 @@ class CURVEFit:
         self.x_range = x_range
         self.dx = dx
         self.min_pts = min_pts
+        self.alpha = alpha
 
         self.lane_path = Path()
         
         #TODO: (2) RANSAC Parameter 입력
-        '''
+
         # RANSAC Parameter를 결정하는 영역입니다.
         # RANSAC의 개념 및 아래 링크를 참고하여 적절한 Parameter를 입력하기 바랍니다.
         # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
         
-        self.ransac_left = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=alpha),
-                                                        max_trials=입력,
+        self.ransac_left = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=self.alpha),
+                                                        max_trials=100,
                                                         loss='absolute_loss',
                                                         min_samples=self.min_pts,
                                                         residual_threshold=self.y_margin)
 
-        self.ransac_right = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=alpha),
-                                                        max_trials=입력,
+        self.ransac_right = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=self.alpha),
+                                                        max_trials=100,
                                                         loss='absolute_loss',
                                                         min_samples=self.min_pts,
                                                         residual_threshold=self.y_margin)
-        '''
+
         
         self._init_model()
 

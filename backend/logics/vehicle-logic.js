@@ -60,3 +60,34 @@ exports.find = async (req, res) => {
         res.status(500).json({ error: 'An error occurred' });
     }
 }
+
+exports.move = async (req, res) => {
+    const vehicle_id = req.body.vehicle_id
+    const destination = req.body.destination
+
+    
+    const sql = 'UPDATE `vehicle` SET `destination` = ? WHERE (`id` = ?);'
+    const params = [destination, vehicle_id]
+
+    
+    connection.query(sql, params, function (error, results, fields) {
+        if (error) reject(error);
+        
+        res.status(200).json(results)
+    });
+        
+    
+}
+
+exports.stop = async (req, res) => {
+    const vehicle_id = req.body.vehicle_id
+
+    const sql = 'UPDATE `vehicle` SET `destination` = null WHERE (`id` = ?);'
+    const params = [ vehicle_id]
+
+    connection.query(sql, params, function (error, results, fields) {
+        if (error) reject(error);
+        
+        res.status(200).json(results)
+    });
+}

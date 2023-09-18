@@ -1,5 +1,6 @@
 
 const connection = require("../utils/database.js")
+const jwt = require("jsonwebtoken");
 
 
 const crypto = require("crypto");
@@ -61,8 +62,9 @@ exports.delete = async (req, res) => {
         res.status(200).json(results)
     })
 }
-
+// 현재 유저의 예약정보 받아오기
 exports.get_reservation = async (req, res) => {
+    console.log('here')
     const user_id = req.params.id
 
     const sql = 'SELECT * FROM reservation WHERE (`user_id` = ?);'
@@ -73,3 +75,60 @@ exports.get_reservation = async (req, res) => {
         res.status(200).json(results)
     })
 }
+
+exports.login = async (req, res) => {
+    try {
+      const params = [req.body.email]
+      
+      let sql = "select * from `user` where email=?";
+  
+      const result = await new Promise((resolve, reject) => {
+        connection.query(sql, params, function (error, results, fields) {
+            if (error) reject(error);
+            resolve(results);
+            });
+        });
+  
+      if (result.length === 0) {
+        
+        return res
+          .status(202)
+          .json({ code: 202, message: "존재하지 않는 아이디" });
+      }
+      const str = result[0].password
+      const pw = str.substring(0, str.length - 12);
+      console.log(pw)
+      if (pw === req.body.password) {
+        console.log('로그인 성공')
+      }
+      else {
+        return res.status(501).json({code : 501, message : '비밀번호 틀림.'})
+      }
+      
+      // 위에서 return 되지 않았다면 로그인 성공
+      // 토큰 생성
+      const token = jwt.sign(
+        { email: req.email },
+        "secret_key",
+        { expiresIn: "1h" }
+      );
+  
+      
+      
+      return res
+        .status(200)
+        .json({
+          code: 200,
+          message: "로그인 성공",
+          token: token,
+          id : result[0].id,
+          email: result[0].email,
+          name : result[0].name,
+          phonenumber : result[0].phonenumber
+        });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ code: 500, message: "서버 오류" });
+    }
+  };
+  

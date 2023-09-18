@@ -50,17 +50,16 @@ class lc_path_pub :
         object_topic_name = arg[1]
 
         #TODO: (1) subscriber, publisher 선언
-        '''
+
         # Gloabl Path 와 Odometry, Object 데이터를 수신 할 Subscriber 를 만들고 
         # lane_change_path 를 전송 할 publisher 변수를 만든다.
         # lane_change_path 는 차선변경 예제에서 활용할 지역경로(Loacl Path)이다.
         # lane_change_path 의 Topic 이름은 '/lane_change_path' 이고
         # ROS 메시지 형식은 Path 이다.
-        rospy.Subscriber( "odom" )
-        self.global_path_pub = 
-        self.local_path_pub = 
+        rospy.Subscriber( "odom",Odometry,self.odom_callback )
+        self.global_path_pub = rospy.Publisher('/global_path',Path,queue_size=100)
+        self.local_path_pub = rospy.Publisher('lane_change_path',Path,queue_size=100)
 
-        '''
 
         self.lc_1=Path()
         self.lc_1.header.frame_id='/map'
@@ -70,7 +69,6 @@ class lc_path_pub :
         #TODO: (2) 두개의 차선 경로 의 텍스트파일을 읽기 모드로 열기
         rospack=rospkg.RosPack()
         pkg_path=rospack.get_path('ssafy_3')
-        '''
         lc_1 = pkg_path + '/path' + '/lc_1.txt'
         self.f=open(lc_1,'r')
 
@@ -81,8 +79,6 @@ class lc_path_pub :
 
         self.f.close()
 
-        '''
-
         self.is_object_info = False
         self.is_odom = False
 
@@ -92,11 +88,9 @@ class lc_path_pub :
         self.current_lane = 1
 
         #TODO: (3) 읽어 온 경로 데이터를 Global Path 로 지정
-        '''
         # 읽어 온 Path 데이터 중 Ego 차량의 시작 경로를 지정합니다.
         global_path = self.lc_1
 
-        '''
 
         rate = rospy.Rate(10) # 10hz
         while not rospy.is_shutdown():
@@ -113,12 +107,11 @@ class lc_path_pub :
                 global_path = self.lc_planning(global_npc_info,local_npc_info,currnet_waypoint,global_path)
 
                 #TODO: (7) 경로 데이터 Publish
-                '''
                 # 경로 데이터 메세지 를 전송하는 publisher 를 만든다.
-                self.local_path_pub.
-                self.global_path_pub.
+                self.local_path_pub.publish(self.local_path_msg)
+                self.global_path_pub.publish(global_path)
                 
-                '''
+
 
             rate.sleep()
 
@@ -217,13 +210,11 @@ class lc_path_pub :
 
     def lc_planning(self,global_obj,local_obj,currnet_waypoint,global_path):
         #TODO: (5) 장애물이 있다면 주행 경로를 변경 하도록 로직 작성
-        '''
         # 전방에 장애물이 있다면 차선 변경을 시작하는 로직을 작성합니다.
         # 차선 변경을 시작하면 차선 변경을 위한 경로를 생성합니다.
         # 차선 변경을 위한 경로를 주행 중 경로 끝에 도달하면 차선 변경을 한 차선으로 경로를 변경합니다. 
         # 차선변경을 시작하면 경로 상 장애물은 체크 하지 않도록 합니다.
 
-        '''
         lane_change_distance = 30 * 2 # (point-to-point distance 0.5m)
 
         if self.lane_change == True:
@@ -261,7 +252,6 @@ class lc_path_pub :
     def check_object(self,ref_path,global_vaild_object,local_vaild_object):
         #TODO: (4) 주행 경로상의 장애물 유무 확인
         self.object=[False,0]
-        '''
         # 주행 경로 상의 장애물의 유무를 파악합니다.
         # 장애물이 한개 이상 있다면 self.object 변수의 첫번째 값을 True 로 둡니다.
         # 장애물의 대한 정보는 List 형식으로 self.object 변수의 두번째 값으로 둡니다.
@@ -275,20 +265,19 @@ class lc_path_pub :
             for i in range(len(global_vaild_object)):
                 for path in ref_path.poses :   
                     if global_vaild_object[i][0]==1 or global_vaild_object[i][0]==2 :  
-                        dis = 
+                        dis = sqrt(pow(path.pose.position.x,2)+pow(path.pose.position.y,2))
                         if dis<2.5:
-                            rel_distance=                         
+                            rel_distance= sqrt(pow(local_vaild_object[i][1],2)+pow(local_vaild_object[i][2]))
                             if rel_distance < min_rel_distance:
-                                min_rel_distance = 
+                                min_rel_distance = rel_distance
                                 self.object=[True,i]
-        '''
+
 
     def getLaneChangePath(self,ego_path,lc_path,start_point,end_point,start_next_point, end_waypoint_idx): ## 
         out_path=Path()  
         out_path.header.frame_id='/map'
 
         #TODO: (6) 차선변경 시작점과 끝점을 이어주는 주행 경로 생성
-        '''
         # 차선변경 시작 점과 끝점을 연결하는 직선 경로를 그립니다.
         # 차선 변경 시작 지점과 끝 점 사이 거리를 계산합니다.
         # 계산된 거리를 Point 간 간격으로 나누어 필요한 Point 의 개수를 구합니다.
@@ -297,22 +286,22 @@ class lc_path_pub :
         # 
 
         point_to_point_distance = 0.5
-        start_path_distance = 
+        start_path_distance = sqrt(pow(start_point.pose.position.x-end_point.pose.position.x,2)+pow(start_point.pose.position.y-end_point.pose.posision.y,2))
         start_path_repeat = int(start_path_distance/point_to_point_distance)
 
-        theta = 
+        theta = atan2(end_point.pose.position.y-start_point.pose.position.y,end_point.pose.position.x-start_point.pose.position.x)
 
-        ratation_matric_1 = np.array([  [   cos(    ), -sin(    )  ],
-                                        [   sin(    ),  cos(    )  ]    ])
+        ratation_matric_1 = np.array([  [   cos(theta), -sin(theta)  ],
+                                        [   sin(theta),  cos(theta)  ]    ])
 
         for k in range(0,start_path_repeat+1):
             ratation_matric_2 = np.array([  [ k*point_to_point_distance ],  
                                             [ 0                         ]   ])
             roation_matric_calc = np.matmul(ratation_matric_1,ratation_matric_2)
             read_pose=PoseStamped()
-            read_pose.pose.position.x = 
-            read_pose.pose.position.y = 
-            read_pose.pose.position.z = 0.
+            read_pose.pose.position.x = start_point.pose.position.x + roation_matric_calc[0][0]
+            read_pose.pose.position.y = start_point.pose.position.y + roation_matric_calc[1][0]
+            read_pose.pose.position.z = 0
             read_pose.pose.orientation.x = 0
             read_pose.pose.orientation.y = 0
             read_pose.pose.orientation.z = 0
@@ -334,7 +323,6 @@ class lc_path_pub :
             read_pose.pose.orientation.w=1
             out_path.poses.append(read_pose)
 
-        '''
 
         return out_path
 

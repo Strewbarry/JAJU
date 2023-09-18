@@ -33,8 +33,8 @@ class SCANCluster:
         # DBSCAN의 Parameter를 결정하는 영역입니다.
         # sklearn.cluster의 DBSCAN에 대해 조사하여 적절한 Parameter를 입력하기 바랍니다.
 
-        self.dbscan = DBSCAN( , , ...)
         '''
+        self.dbscan = DBSCAN(eps=0.5, min_samples=5)
     
     def callback(self, msg):    
         self.pc_np = self.pointcloud2_to_xyz(msg)
@@ -62,11 +62,12 @@ class SCANCluster:
                 # 계산된 위치 값을 ROS geometry_msgs/Pose type으로 입력합니다.
                 # Input : cluster
                 # Output : cluster position x,y   
+                '''
+                c_tmp = np.mean(pc_xy[db==c, :],axis=0)
 
                 tmp_pose=Pose()
-                #tmp_pose.position.x = 
-                #tmp_pose.position.y = 
-                '''
+                tmp_pose.position.x = c_tmp.tolist()[0]
+                tmp_pose.position.y = c_tmp.tolist()[1]
                 cluster_msg.poses.append(tmp_pose)
                 
         self.cluster_pub.publish(cluster_msg)
@@ -82,9 +83,9 @@ class SCANCluster:
             # 각 Point의 XYZ 값을 활용하여 Distance와 Yaw Angle을 계산합니다.
             # Input : point (X, Y, Z, Intensity)            
             
-            dist = 
-            angle = 
             '''
+            dist = np.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
+            angle = np.arctan2(point[1], point[0])
             
             if point[0] > 0 and 1.50 > point[2] > -1.25 and dist < 50:
                 point_list.append((point[0], point[1], point[2], point[3], dist, angle))

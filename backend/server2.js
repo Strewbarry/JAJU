@@ -21,6 +21,9 @@ app.use('/user', userRoutes)
 const vehicleRoutes = require("./routes/vehicle-router")
 app.use('/vehicle', vehicleRoutes)
 
+const reservationRoutes = require("./routes/reservation-router")
+app.use('/reservation', reservationRoutes)
+
 app.listen(app.get('port'), () => {
     console.log(app.get('port'), '번 포트에서 대기중')
 })

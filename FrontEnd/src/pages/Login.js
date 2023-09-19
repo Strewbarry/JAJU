@@ -1,50 +1,65 @@
 import React, { useState } from 'react';
 import styles from './Login.module.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // useNavigate를 import 합니다
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // errorMessage 상태를 추가합니다
-  const navigate = useNavigate(); // useNavigate를 선언합니다
+  const [errorMessage, setErrorMessage] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const userData = {
-      email, 
+      email,
       password,
     };
 
     try {
       const response = await axios.post('http://192.168.100.38:3000/user/login', userData);
-      
+
       if (response.status === 200) {
-        console.log(response)
-        console.log(response.data.name)
-        // 아이디 들고 다니면 편하다
-        const { token, name, id } = response.data; // response에서 token, name, id를 가져옵니다
-        localStorage.setItem('token', token); // token을 localStorage에 저장합니다
-        localStorage.setItem('name', name); // name을 localStorage에 저장합니다
-        localStorage.setItem('userId', id); // id를 localStorage에 저장합니다 
-        navigate('/'); // 메인 페이지로 이동합니다
-        window.location.reload(); // 페이지를 리로드합니다
+        const { token, name, id } = response.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('name', name);
+        localStorage.setItem('userId', id);
+        navigate('/');
+        window.location.reload();
       } else {
-        setErrorMessage('로그인 중 오류가 발생했습니다'); // 오류 메시지를 설정합니다
+        handleModal(response.status);
       }
 
     } catch (error) {
       console.error('Error:', error);
-      setErrorMessage('로그인 중 오류가 발생했습니다'); // 네트워크 오류 또는 기타 오류가 발생하면 오류 메시지를 설정합니다
+      setErrorMessage('로그인 중 오류가 발생했습니다');
     }
+  };
+
+  const handleModal = (status) => {
+    if (status === 202) {
+      setModalMessage('등록되지 않은 아이디 입니다');
+    } else if (status === 205) {
+      setModalMessage('비밀번호가 틀렸습니다');
+    } else {
+      setModalMessage('로그인 중 오류가 발생했습니다');
+    }
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalMessage('');
   };
 
   return (
     <div className={styles.loginContainer}>
       <form onSubmit={handleSubmit} className={styles.loginForm}>
         <h2>Login</h2>
-        {errorMessage && <p>{errorMessage}</p>} {/* errorMessage가 있으면 표시합니다 */}
+        {errorMessage && <p>{errorMessage}</p>}
         <div className={styles.inputField}>
           <label>Email</label>
           <input
@@ -64,9 +79,39 @@ function Login() {
           />
         </div>
         <button type="submit">Login</button>
+        <p style={{ textAlign: 'center', marginTop: '10px' }}>
+          <a href="/password-reset" style={{ color: '#800080' }}>비밀번호를 잊어버리셨나요?</a>
+        </p>
       </form>
+
+      {isModalOpen && (
+        <div style={modalStyles}>
+          <div style={modalContentStyles}>
+            <p>{modalMessage}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+const modalStyles = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+};
+
+const modalContentStyles = {
+  backgroundColor: '#fff',
+  padding: '20px',
+  borderRadius: '5px',
+};
 
 export default Login;

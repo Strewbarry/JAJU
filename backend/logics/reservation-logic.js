@@ -1,11 +1,19 @@
 const connection = require("../utils/database.js")
 
 exports.make = async (req, res) => {
+    const user_email = res.locals.email
+    const user_id = await new Promise((resolve, reject) => {
+        connection.query('SELECT id FROM user WHERE (`email` = ?);', user_email, function (error, results, fields) {
+            if (error) reject(error);
+            resolve(results);
+        });
+    });
+
     const reservation_time = new Date(req.body.reservation_time)
     const return_time = new Date(req.body.return_time)
 
     const sql = 'INSERT INTO reservation (`user_id`, `vehicle_id`, `reservation_time`, `return_time`, `get_location`) VALUES (?,?,?,?,?)'
-    const params = [req.body.user_id, req.body.vehicle_id, reservation_time, return_time, req.body.get_location]
+    const params = [user_id[0].id, req.body.vehicle_id, reservation_time, return_time, req.body.get_location]
 
     connection.query(sql, params, function (error, results, fields) {
         if (error) throw error;

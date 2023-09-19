@@ -45,4 +45,5 @@
 @import "~slick-carousel/slick/slick-theme.css";
 .RecommendedSpot {
   margin-top: 220px; /* 혹은 원하는 값으로 조절하세요 */
+  padding: 0 15px; /* 좌우에 20px의 패딩 추가 */
 }

@@ -3,14 +3,14 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f0f0;
+  background-color: #e0b0ff; /* 자주빛에서 보라빛으로 변경 */
 }
 
 .loginForm {
   background-color: #fff;
   padding: 20px;
   border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(128, 0, 128, 0.1); /* 보라색 계열의 그림자 */
   max-width: 300px;
   width: 100%;
 }
@@ -19,6 +19,7 @@
   margin-bottom: 20px;
   font-size: 24px;
   text-align: center;
+  color: #800080; /* 제목을 보라색으로 변경 */
 }
 
 .inputField {
@@ -29,19 +30,20 @@
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
+  color: #800080; /* 라벨을 보라색으로 변경 */
 }
 
 .inputField input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #800080; /* 입력 필드 테두리를 보라색으로 변경 */
   border-radius: 5px;
 }
 
 .loginForm button {
   width: 100%;
   padding: 10px;
-  background-color: #28a745;
+  background-color: #800080; /* 버튼 배경색을 보라색으로 변경 */
   border: none;
   border-radius: 5px;
   color: #fff;
@@ -49,5 +51,5 @@
 }
 
 .loginForm button:hover {
-  background-color: #218838;
+  background-color: #660066; /* 버튼 호버 시 보라색 계열의 어두운 색으로 변경 */
 }

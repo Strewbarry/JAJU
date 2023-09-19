@@ -9,6 +9,15 @@ function Menu() {
   const [name, setName] = useState(null); // 이름을 저장할 상태 변수를 추가합니다.
   const [id, setId] = useState(null);
 
+  const [isModalOpen, setIsModalOpen] = useState(false); // modal창
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedName = localStorage.getItem('name'); // 로컬 스토리지에서 이름을 가져옵니다.
@@ -27,17 +36,18 @@ function Menu() {
     setToken(null);
     setName(null); // 상태 변수도 초기화합니다.
     navigate('/');
+    window.location.reload(); // 페이지를 새로고침합니다.
   };
-  const handleDeleteAccount = async () => {
+  const confirmDeleteAccount = async () => {
     try {
-      const response = await axios.delete('http://192.168.100.38:3000/user/delete', {}, {
+      const response = await axios.delete('http://192.168.100.38:3000/user/delete', {
         headers: {
           'authorization': localStorage.getItem('token')
         }
       });
       if(response.status === 200) {
         alert('회원 탈퇴가 완료되었습니다.');
-        handleLogout(); // 로그아웃 함수를 호출하여 로그아웃 처리를 합니다.
+        handleLogout();
       } else {
         alert('회원 탈퇴 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
@@ -63,10 +73,19 @@ function Menu() {
       {!token && <button className={styles.button} onClick={goToLogin}>로그인</button>}
       {!token && <button className={styles.button} onClick={goToSignup}>회원가입</button>}
       {token && <button className={styles.button} onClick={handleLogout}>로그아웃</button>}
-      {token && <button className={styles.button} onClick={handleDeleteAccount}>회원 탈퇴</button>} {/* 회원 탈퇴 버튼을 추가합니다. */}
+      {token && <button className={`${styles.button} ${styles.deleteButton}`} onClick={openModal}>회원 탈퇴</button>}
+      {isModalOpen && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <p>정말로 회원 탈퇴 하시겠습니까?</p>
+            <button onClick={confirmDeleteAccount}>예</button>
+            <button onClick={closeModal}>아니오</button>
+          </div>
+        </div>
+      )}
     </div>
   );
-  
 }
+
 
 export default Menu;

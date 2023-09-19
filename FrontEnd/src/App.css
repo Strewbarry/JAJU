@@ -1,0 +1,48 @@
+/* 모든 버튼에 공통적으로 적용할 기본 스타일 */
+.map-buttons button {
+  width: 100%; /* 버튼의 가로 길이를 꽉 차게 설정 */
+  margin: 5px 0; /* 버튼 사이에 약간의 간격을 둠 */
+  padding: 10px; /* 버튼 내부의 패딩을 추가 */
+  font-size: 16px; /* 폰트 크기 설정 */
+}
+
+/* 첫 번째 버튼 스타일 */
+.map-buttons button:first-child {
+  position: absolute; /* 절대 위치 지정 */
+  top: 20%; /* 버튼을 중간보다 약간 위쪽에 위치시킴 */
+  left: 0; /* 왼쪽 정렬 */
+  
+  height: 100px; /* 버튼의 높이 설정 */
+  margin-right: 20px; /* 오른쪽 마진 추가 */
+  background-image: url('../src/assets/hatchback.png'); /* 배경 이미지 추가 */
+  background-size: contain; /* 배경 이미지를 버튼 크기에 맞게 조정 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
+  background-position: right center; /* 배경 이미지를 오른쪽 중앙에 위치시킴 */
+}
+
+
+
+/* 두 번째 및 세 번째 버튼 스타일 */
+.map-buttons button:nth-child(2),
+.map-buttons button:nth-child(3) {
+  width: 48%; /* 버튼 가로 길이를 반으로 설정 (간격 때문에 약간 줄임) */
+  position: absolute; /* 절대 위치 지정 */
+  top: 40%; /* 첫 번째 버튼 아래에 위치 */
+}
+
+/* 두 번째 버튼 스타일: 왼쪽에 배치 */
+.map-buttons button:nth-child(2) {
+  left: 0; /* 왼쪽 정렬 */
+}
+
+/* 세 번째 버튼 스타일: 오른쪽에 배치 */
+.map-buttons button:nth-child(3) {
+  right: 0; /* 오른쪽 정렬 */
+}
+
+
+@import "~slick-carousel/slick/slick.css"; 
+@import "~slick-carousel/slick/slick-theme.css";
+.RecommendedSpot {
+  margin-top: 220px; /* 혹은 원하는 값으로 조절하세요 */
+}

@@ -5,10 +5,12 @@ const YOUR_SECRET_KEY = 'secret_key';
 const verifyToken = (req, res, next) => {
   try {
     const clientToken = req.headers.authorization;
+    console.log(clientToken)
     const decoded = jwt.verify(clientToken, YOUR_SECRET_KEY);
  
     if (decoded) {
       res.locals.email = decoded.email;
+      // console.log(decoded)
       next();
     } 
   } catch (error) {

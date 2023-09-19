@@ -7,6 +7,7 @@ exports.find = async (req, res) => {
     const start_time = new Date(req.body.start_time)
     const end_time = new Date(req.body.end_time)
     let vehicle_list = []
+    console.log(start_time, end_time)
 
     try {
         const sql = 'SELECT * from vehicle WHERE (`around_location`=?);'
@@ -36,7 +37,7 @@ exports.find = async (req, res) => {
             if (result.length >= 1) {
 
                 for (const res of result) {
-                    console.log(res)
+                    
                     if ((start_time <= res.reservation_time && res.reservation_time <= end_time) ||
                         (start_time <= res.return_time && res.return_time <= end_time) ||
                         (res.reservation_time <= start_time && start_time <= res.return_time) ||
@@ -45,7 +46,7 @@ exports.find = async (req, res) => {
                         break
                         
                     }
-                console.log(res, start_time, end_time)
+                
                 }
             }
             if (reservate_able === true) {

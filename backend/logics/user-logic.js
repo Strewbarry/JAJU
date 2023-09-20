@@ -86,6 +86,7 @@ exports.delete = async (req, res) => {
 exports.get_reservation = async (req, res) => {
     // 토큰에서 유저 이메일 추출
     const user_email = res.locals.email
+    // 추출한 이메일을 기반으로 유저 id 찾기
     const user_id = await new Promise((resolve, reject) => {
         connection.query('SELECT id FROM user WHERE (`email` = ?);', user_email, function (error, results, fields) {
             if (error) reject(error);
@@ -93,7 +94,7 @@ exports.get_reservation = async (req, res) => {
         });
     });
     
-    
+    // 찾은 유저 id를 통해 그 유저의 예약한 리스트들 조회
     const sql = 'SELECT * FROM reservation WHERE (`user_id` = ?);'
     const params = [user_id]
     connection.query(sql, params, function(error, results, fields) {
@@ -103,10 +104,11 @@ exports.get_reservation = async (req, res) => {
     })
 }
 
+// 로그인
 exports.login = async (req, res) => {
     try {
       const params = [req.body.email]
-      
+      // 입력한 이메일이 데이터베이스에 있는지 확인
       let sql = "select * from `user` where email=?";
   
       const result = await new Promise((resolve, reject) => {
@@ -115,20 +117,26 @@ exports.login = async (req, res) => {
             resolve(results);
             });
         });
-  
+    // 만약 데이터베이스에 없다면
       if (result.length === 0) {
-        
+        // 존재하지 않는 아이디 전송
         return res
           .status(202)
           .json({ code: 202, message: "존재하지 않는 아이디" });
       }
+
+      // 입력한 아이디가 있다면 그 아이디에 해당하는 비밀번호를
+      // salt를 빼고 추출
       const str = result[0].password
       const pw = str.substring(0, str.length - 12);
       console.log(pw)
       console.log(req.body.password)
+      // 입력한 비밀번호와 저장된 비밀번호가 같다면
+      // 로그인이 된 것이니 생략
       if (pw === req.body.password) {
         console.log('로그인 성공')
       }
+      // 다르다면 틀린 비밀번호 메세지 전송
       else {
         
         return res.status(205).json({code : 205, message : '비밀번호 틀림.'})
@@ -136,14 +144,15 @@ exports.login = async (req, res) => {
       
       // 위에서 return 되지 않았다면 로그인 성공
       // 토큰 생성
+      // 만료시간은 3시간
       const token = jwt.sign(
         { email: req.body.email },
         "secret_key",
-        { expiresIn: "1h" }
+        { expiresIn: "3h" }
       );
   
       
-      
+      // 로그인이 성공했으니 저장된 데이터들 전송
       return res
         .status(200)
         .json({

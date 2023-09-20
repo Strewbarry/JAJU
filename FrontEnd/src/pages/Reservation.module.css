@@ -1,0 +1,95 @@
+.reservationContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  max-width: 300px; /* 모바일 환경을 위한 최대 너비 설정 */
+  margin: 0 auto;
+}
+
+.field {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 8px;
+}
+
+select, input {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+.dateTime {
+  display: flex;
+  gap: 8px;
+}
+.dateInput {
+  flex: 2;
+}
+
+.timeInput {
+  flex: 1;
+}
+
+.dateTime {
+  display: flex;
+  gap: 8px;
+}
+
+/* 기존 스타일 */
+.reservationContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.field {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 8px;
+}
+
+select, input {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.viewCarsButton {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #4CAF50; /* 예: 녹색 배경 */
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.viewCarsButton:hover {
+  background-color: #45a049; /* 버튼 호버 시 색상 */
+}
+
+.findVehicleButton {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}

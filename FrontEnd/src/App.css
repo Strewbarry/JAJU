@@ -2,7 +2,7 @@
 .map-buttons button {
   width: 100%; /* 버튼의 가로 길이를 꽉 차게 설정 */
   margin: 5px 0; /* 버튼 사이에 약간의 간격을 둠 */
-  padding: 10px; /* 버튼 내부의 패딩을 추가 */
+  padding: 15px; /* 버튼 내부의 패딩을 추가 */
   font-size: 16px; /* 폰트 크기 설정 */
 }
 
@@ -11,6 +11,7 @@
   position: absolute; /* 절대 위치 지정 */
   top: 20%; /* 버튼을 중간보다 약간 위쪽에 위치시킴 */
   left: 0; /* 왼쪽 정렬 */
+
   
   height: 100px; /* 버튼의 높이 설정 */
   margin-right: 20px; /* 오른쪽 마진 추가 */
@@ -32,12 +33,13 @@
 
 /* 두 번째 버튼 스타일: 왼쪽에 배치 */
 .map-buttons button:nth-child(2) {
-  left: 0; /* 왼쪽 정렬 */
+  left: 5px; /* 왼쪽 정렬 */
 }
 
 /* 세 번째 버튼 스타일: 오른쪽에 배치 */
 .map-buttons button:nth-child(3) {
-  right: 0; /* 오른쪽 정렬 */
+  right: 5px; /* 오른쪽 정렬 */
+  
 }
 
 

@@ -6,6 +6,7 @@ const connection = require("../utils/database.js")
 exports.find = async (req, res) => {
     const start_time = new Date(req.body.start_time)
     const end_time = new Date(req.body.end_time)
+    console.log(start_time, end_time)
     let vehicle_list = []
     console.log(start_time, end_time)
 

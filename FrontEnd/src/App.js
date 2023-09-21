@@ -5,14 +5,17 @@ import 'leaflet/dist/leaflet.css';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 
 import Map from './pages/Map';
+import MapReservation from './pages/Map_Reservation';
 import Reservation from './pages/Reservation';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Event from './pages/Event'
-
+import CarList from './pages/CarList';
+import CheckReservation from './pages/CheckReservation';
 import Header from './Header';
 import Menu from './pages/Menu';
 import Footer from './Footer';
+
 
 import Recommended from './Recommend/RecommendedSpot';  // RecommendedSpot 임포트
 import Yangyang from './Recommend/Yangyang';
@@ -35,8 +38,14 @@ function MainPage() {
     navigate('/map');
   };
   const goToReservation = () => {
-    navigate('/reservation');
+    if (token) {
+      navigate('/reservation');
+    } else {
+      alert('로그인 후 이용해 주세요.');
+      navigate('/login');
+    }
   };
+  
 
   const goToEvent = () => {
     navigate('/event');
@@ -46,7 +55,7 @@ function MainPage() {
   return (
     <div>
       <div className="map-buttons">
-        <button onClick={goToMap}>근처 이용가능 맵 보기</button>
+        <button onClick={goToMap}>바로 이용가능한 차량 보기</button>
         <button onClick={goToReservation}>예약 페이지로 이동</button>
         <button onClick={goToEvent}>이벤트</button>
       </div>
@@ -65,9 +74,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/map" element={<Map />} />
+        <Route path="/mapreservation" element={<MapReservation />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/event" element={<Event />} />
-
+        <Route path="/carlist" element={<CarList />} />
+        <Route path="/checkreservation" element={<CheckReservation />} />
         <Route path="/yangyang" element={<Yangyang />} />
         <Route path="/seoul" element={<Seoul />} />
         <Route path="/busan" element={<Busan />} />

@@ -53,7 +53,7 @@ class pure_pursuit :
         
         '''
         arg = rospy.myargv(argv=sys.argv)
-        local_path_name = arg[1]
+        local_path_name = arg[0]
 
         rospy.Subscriber(local_path_name, Path, self.path_callback)
 
@@ -68,7 +68,7 @@ class pure_pursuit :
         rospy.Subscriber("local_path", Path, self.path_callback)
         rospy.Subscriber("odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
-        rospy.Subscriber("/GetTrafficLightStatus", GetTrafficLightStatus, traffic_light_callback)
+        rospy.Subscriber("/GetTrafficLightStatus", GetTrafficLightStatus, self.traffic_light_callback)
 
         
         self.ctrl_cmd_pub = rospy.Publisher('ctrl_cmd',CtrlCmd, queue_size=100)
@@ -84,6 +84,10 @@ class pure_pursuit :
 
         self.is_look_forward_point = False
 
+        self.traffic_light = None
+        self.is_traffic_light = False
+        self.cnt = 0
+
         self.forward_point = Point()
         self.current_postion = Point()
 
@@ -93,6 +97,7 @@ class pure_pursuit :
         self.max_lfd = 30
         self.lfd_gain = 0.78
         self.target_velocity = 40
+        
 
         self.pid = pidControl()
         self.vel_planning = velocityPlanning(self.target_velocity/3.6, 0.15)
@@ -111,7 +116,8 @@ class pure_pursuit :
                 prev_time = time.time()
                 
                 self.current_waypoint = self.get_current_waypoint(self.status_msg,self.global_path)
-                if(self.trffic_light==1):
+                rospy.loginfo("traffic_light : {}".format(self.traffic_light))
+                if(self.traffic_light==1):
                     self.target_velocity = 0
                 else:
                     self.target_velocity = self.velocity_list[self.current_waypoint]*3.6
@@ -161,13 +167,48 @@ class pure_pursuit :
         self.global_path = msg
         self.is_global_path = True
 
-    def traffic_light_callback(self,data):
-        self.trffic_light = data.trafficLightStatus
+    def traffic_light_callback(self, data):
+        self.is_traffic_light = True
+        first_light = None
+        second_light = None
+        first_light = data.trafficLightStatus
+
+        if first_light == 1:
+            time.sleep(1)
+            second_light = data.trafficLightStatus
+            if first_light == second_light:
+                self.traffic_light = 1
+            else:
+                self.traffic_light = second_light
+        else:
+            self.traffic_light = first_light
+
+
+
+        # self.traffic_light = data.trafficLightStatus
+        # tLight = data.trafficLightStatus
+        # rospy.loginfo("ligthstatus : {}".format(tLight))
+        # if(tLight == 1):
+        #     time.sleep(1)
+        #     tLightAfter = data.trafficLightStatus
+        #     rospy.loginfo("tLight : {}".format(tLight))
+        #     rospy.loginfo("AtferLight : {}".format(tLightAfter))
+        #     if(tLight==tLightAfter):
+        #         rospy.loginfo("red detected")
+        #         self.traffic_light = 1
+        # else:
+        #     self.traffic_light = tLight
+
+
         # os.system('clear')
         # rospy.loginfo('-------------------- Traffic Light Vehicle -------------------------')
         # rospy.loginfo("Traffic Light Idx    : {}".format(data.trafficLightIndex))
         # rospy.loginfo("Traffic Light Status : {}".format(data.trafficLightStatus))
         # rospy.loginfo("Traffic Light Type   : {}".format(data.trafficLightType))
+
+    def calc_traffic_light(self,):
+        light = self.traffic_light
+        return light
     
     def get_current_waypoint(self,ego_status,global_path):
         min_dist = float('inf')        
@@ -181,6 +222,7 @@ class pure_pursuit :
                 min_dist = dist
                 currnet_waypoint = i
         return currnet_waypoint
+
 
     def calc_pure_pursuit(self,):
 
@@ -199,7 +241,7 @@ class pure_pursuit :
         elif self.lfd > self.max_lfd :
             self.lfd=self.max_lfd
 
-        rospy.loginfo(self.lfd)
+        rospy.loginfo("lfd : {}".format(self.lfd))
 
 
         

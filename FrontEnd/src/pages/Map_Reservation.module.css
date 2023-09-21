@@ -1,0 +1,30 @@
+.mapContainer {
+    height: 450px;
+  }
+  
+  .mapButtons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .textCenter {
+    text-align: center;
+  }
+  
+  .clickedPositionInfo {
+    margin-top: 10px;
+  }
+  

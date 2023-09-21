@@ -16,6 +16,7 @@ import Header from './Header';
 import Menu from './pages/Menu';
 import Footer from './Footer';
 
+
 import Recommended from './Recommend/RecommendedSpot';  // RecommendedSpot 임포트
 import Yangyang from './Recommend/Yangyang';
 import Seoul from './Recommend/Seoul';
@@ -78,7 +79,6 @@ function App() {
         <Route path="/event" element={<Event />} />
         <Route path="/carlist" element={<CarList />} />
         <Route path="/checkreservation" element={<CheckReservation />} />
-
         <Route path="/yangyang" element={<Yangyang />} />
         <Route path="/seoul" element={<Seoul />} />
         <Route path="/busan" element={<Busan />} />

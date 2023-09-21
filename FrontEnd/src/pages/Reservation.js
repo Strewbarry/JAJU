@@ -12,8 +12,9 @@ const Reservation = () => {
   const [returnTime, setReturnTime] = useState('');
   const [returnMinutes, setReturnMinutes] = useState('');
   const [availableCars, setAvailableCars] = useState([1, 2, 3]); 
+  const [showModal, setShowModal] = useState(false);
 
-  const regions = ['상암', '양양', '강릉', '부산'];
+  const regions = ['서울', '부산', '제주','강릉','대전','광주','구미','K-city'];
   const times = Array.from({length: 24}, (_, i) => i < 10 ? `0${i}` : `${i}`);
   const minutesOptions = ['00', '30'];
 
@@ -39,6 +40,11 @@ const Reservation = () => {
 
       const availableCarIds = response.data.map(da => da.car_info_id);
       setAvailableCars(availableCarIds);
+
+      if (availableCarIds.length === 0) {
+        setShowModal(true);
+      }
+
     } catch (error) {
       console.error('Error making POST request:', error);
     }
@@ -46,25 +52,66 @@ const Reservation = () => {
 
   const navigate = useNavigate();
 
-  const checkInputAndNavigate = () => {
+  const checkInputAndNavigate = async () => {
     if (!region || !bookingDate || !bookingTime || !bookingMinutes || !returnDate || !returnTime || !returnMinutes) {
       alert('지역과 날짜를 입력해주세요.');
       return;
     }
-
-    navigate('/carlist', { state: { availableCars } });
+  
+    try {
+      const token = localStorage.getItem('token');
+  
+      const response = await axios.post('http://192.168.100.38:3000/vehicle/find', {
+        around_location: region,
+        start_time: `${bookingDate}T${bookingTime}:${bookingMinutes}:00Z`,
+        end_time: `${returnDate}T${returnTime}:${returnMinutes}:00Z`
+      }, {
+        headers: {
+          'authorization': token 
+        }
+      });
+      console.log(response.data);
+  
+      const availableCarIds = response.data.map(da => da.car_info_id);
+      setAvailableCars(availableCarIds);
+  
+      // 차량이 없는 경우 모달을 띄우고, 차량이 있는 경우에만 /carlist로 이동합니다.
+      if (availableCarIds.length === 0) {
+        setShowModal(true);
+      } else {
+        navigate('/carlist', { state: { availableCars } });
+      }
+  
+    } catch (error) {
+      console.error('Error making POST request:', error);
+    }
   };
+  
 
+  const handleRegionChange = (e) => {
+    const selectedRegion = e.target.value;
+    setRegion(selectedRegion);
+    localStorage.setItem('selectedRegion', selectedRegion);
+  };
+  
 return (
     <div className={styles.reservationContainer}>
+        {showModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <span className={styles.closeButton} onClick={() => setShowModal(false)}>X</span>
+            이용할 수 있는 차량이 없습니다.
+          </div>
+        </div>
+      )}
       <div className={styles.field}>
         <label>지역: </label>
-        <select value={region} onChange={(e) => setRegion(e.target.value)}>
-          <option value="" disabled>지역을 선택하세요</option>
-          {regions.map((r, index) => (
-            <option key={index} value={r}>{r}</option>
-          ))}
-        </select>
+          <select value={region} onChange={handleRegionChange}>
+            <option value="" disabled>지역을 선택하세요</option>
+            {regions.map((r, index) => (
+              <option key={index} value={r}>{r}</option>
+            ))}
+          </select>
       </div>
 
       <div className={styles.field}>
@@ -119,7 +166,7 @@ return (
       <div className={styles.field}>
         <button onClick={checkInputAndNavigate} className={styles.viewCarsButton}>이용 가능 차량 보기</button>
         <div className={styles.field}>
-          <button onClick={handleFindVehicle} className={styles.findVehicleButton}>차량 찾기</button>
+          <button onClick={handleFindVehicle} className={styles.findVehicleButton}>콘솔로 찍어보기</button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './Map.module.css';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON } from 'react-leaflet';
@@ -19,13 +19,14 @@ import stationImage from '../assets/station.png';
 import swimImage from '../assets/swimmer.png';
 import beerImage from '../assets/beer.png';
 
-const center = { lat: 37.581897810470394, lng: 126.88914155948626 };
+
 const ZOOM_LEVEL = 16;
 
 const createIcon = (iconUrl) => new L.Icon({
   iconUrl,
   iconSize: [45, 45],
 });
+
 
 const defaultIcon = createIcon(placeholderImage);
 const hotelIcon = createIcon(HotelImage);
@@ -38,7 +39,7 @@ const swimIcon = createIcon(swimImage);
 const beerIcon = createIcon(beerImage);
 
 const markers = [
-  // 차후에 start는 websocket으로 실시간 통신을 받아 이동시킬 예정
+  // 상암
   { position: [37.58200, 126.8889], icon: defaultIcon, label: 'Start 지점' },
   { position: [37.582486, 126.886834], icon: hotelIcon, label: '스탠포드호텔' },
   { position: [37.581255, 126.890845], icon: MBCIcon, label: 'MBC 방송국' },
@@ -47,11 +48,29 @@ const markers = [
   { position: [37.581406, 126.88789], icon: restaurantIcon, label: '한국식 소고기 전문 음식점 [ 배꼽집]' },
   { position: [37.582814591, 126.888950294], icon: stationIcon, label: '기차역' },
   { position: [37.245428193272716, 126.7750329522217], icon: hotelIcon, label: '스탠포드호텔' },
+
+  // K-city
   { position: [37.23918867370749, 126.77313034628662], icon: defaultIcon, label: 'Start 지점' },
   { position: [37.24068299201391, 126.77130810123954], icon: restaurantIcon, label: '한국식 소고기 전문 음식점 [ 배꼽집]' },
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
   { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '술집' },
+
+
+  // 제주도
+  { position: [33.506691, 126.494019], icon: defaultIcon, label: '제주공항' },
+  { position: [33.512792, 126.510484], icon: defaultIcon, label: '미르 게스트하우스' },
+  { position: [33.512738, 126.526128], icon: defaultIcon, label: '제주 동문 시장' },
+  { position: [33.500715, 126.505564], icon: defaultIcon, label: '제주 스타벅스' },
+  { position: [33.495223, 126.492732], icon: defaultIcon, label: '맥도날드' },
+
+
+  // 부산
+  { position: [35.114751, 129.043291], icon: defaultIcon, label: '부산역' },
+  { position: [35.117730, 129.041295], icon: defaultIcon, label: '대건명가돼지국밥' },
+  { position: [35.116212, 129.041592], icon: defaultIcon, label: '아스티호텔 4성급' },
+  { position: [35.116263, 129.040803], icon: defaultIcon, label: '제주 스타벅스' },
+  { position: [35.120741, 129.039271], icon: defaultIcon, label: '개미집 부산역점' },
 
 
 ];
@@ -61,7 +80,7 @@ const callVehicle = async (lat, lng) => {
     const token = localStorage.getItem('token');
     const response = await axios.post('http://192.168.100.38:3000/vehicle/move/destination', { lat, lng }, {
       headers: {
-        'authorization': token // 'Bearer' 없이 토큰을 직접 추가
+        'authorization': token 
       }
     });
     console.log(response.data);
@@ -83,12 +102,34 @@ const RenderMarkers = () => {
 };
 
 function Map() {
-
-
   const [clickedPosition, setClickedPosition] = useState(null);
   const [mapType, setMapType] = useState('normal');
 
+  const [center, setCenter] = useState({ lat: 37.581897810470394, lng: 126.88914155948626 });
+  useEffect(() => {
+    const selectedRegion = localStorage.getItem('selectedRegion');
+    console.log(selectedRegion); // 지역을 콘솔에 로깅
+    if (selectedRegion) {
+      switch (selectedRegion) {
+        case '상암':
+          setCenter({ lat: 37.581897810470394, lng: 126.88914155948626 });
+          break;
+        case '부산':
+          setCenter({ lat: 35.117191, lng: 129.038916 });
+          break;
+        case '제주도':
+          setCenter({ lat: 33.511751, lng: 126.498355 });
+          break;
+        // 필요한 경우 여기에 더 많은 경우를 추가하세요
+        default:
+          break;
+      }
+    }
+  }, []);
 
+  useEffect(() => {
+    console.log("현재 center:", center); // center 값을 콘솔에 로깅
+  }, [center]);
 
   const MapEvents = () => {
     useMapEvents({

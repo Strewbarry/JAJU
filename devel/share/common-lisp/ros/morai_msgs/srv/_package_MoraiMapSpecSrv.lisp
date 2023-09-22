@@ -1,6 +1,1 @@
-(cl:in-package morai_msgs-srv)
-(cl:export '(REQUEST-VAL
-          REQUEST
-          RESPONSE-VAL
-          RESPONSE
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/srv/_package_MoraiMapSpecSrv.lisp

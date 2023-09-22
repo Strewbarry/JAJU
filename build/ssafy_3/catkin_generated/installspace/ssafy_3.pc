@@ -1,4 +1,4 @@
-prefix=/home/kshssafy/catkin_ws/install
+prefix=/home/c104/catkin_ws/install
 
 Name: ssafy_3
 Description: Description of ssafy_3

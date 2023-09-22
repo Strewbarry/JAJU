@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #-*- coding:utf-8 -*-
 
 import rospy
@@ -388,15 +388,26 @@ class CURVEFit:
         # RANSAC의 개념 및 아래 링크를 참고하여 적절한 Parameter를 입력하기 바랍니다.
         # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
         
-        self.ransac_left = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=self.alpha),
+        # self.ransac_left = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=self.alpha),
+        #                                                 max_trials=100,
+        #                                                 loss='absolute_loss',
+        #                                                 min_samples=self.min_pts,
+        #                                                 residual_threshold=self.y_margin)
+
+        # self.ransac_right = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=self.alpha),
+        #                                                 max_trials=100,
+        #                                                 loss='absolute_loss',
+        #                                                 min_samples=self.min_pts,
+        #                                                 residual_threshold=self.y_margin)
+        self.ransac_left = linear_model.RANSACRegressor(linear_model.Lasso(alpha=self.alpha),
                                                         max_trials=100,
-                                                        loss='absolute_loss',
+                                                        loss='absolute_error',
                                                         min_samples=self.min_pts,
                                                         residual_threshold=self.y_margin)
 
-        self.ransac_right = linear_model.RANSACRegressor(base_estimator=linear_model.Lasso(alpha=self.alpha),
+        self.ransac_right = linear_model.RANSACRegressor(linear_model.Lasso(alpha=self.alpha),
                                                         max_trials=100,
-                                                        loss='absolute_loss',
+                                                        loss='absolute_error',
                                                         min_samples=self.min_pts,
                                                         residual_threshold=self.y_margin)
 

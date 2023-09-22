@@ -67,14 +67,14 @@ set(ssafy_1_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(ssafy_1_SOURCE_PREFIX /home/kshssafy/catkin_ws/src/ssafy_1)
-  set(ssafy_1_DEVEL_PREFIX /home/kshssafy/catkin_ws/devel)
+  set(ssafy_1_SOURCE_PREFIX /home/c104/catkin_ws/src/ssafy_1)
+  set(ssafy_1_DEVEL_PREFIX /home/c104/catkin_ws/devel/.private/ssafy_1)
   set(ssafy_1_INSTALL_PREFIX "")
   set(ssafy_1_PREFIX ${ssafy_1_DEVEL_PREFIX})
 else()
   set(ssafy_1_SOURCE_PREFIX "")
   set(ssafy_1_DEVEL_PREFIX "")
-  set(ssafy_1_INSTALL_PREFIX /home/kshssafy/catkin_ws/install)
+  set(ssafy_1_INSTALL_PREFIX /home/c104/catkin_ws/install)
   set(ssafy_1_PREFIX ${ssafy_1_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/kshssafy/catkin_ws/install/lib;/home/kshssafy/catkin_ws/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /home/c104/catkin_ws/install/lib;/home/c104/catkin_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
@@ -211,7 +211,7 @@ foreach(depend ${depends})
   _unpack_libraries_with_build_configuration(ssafy_1_LIBRARIES ${ssafy_1_LIBRARIES})
 
   _list_append_unique(ssafy_1_LIBRARY_DIRS ${${ssafy_1_dep}_LIBRARY_DIRS})
-  list(APPEND ssafy_1_EXPORTED_TARGETS ${${ssafy_1_dep}_EXPORTED_TARGETS})
+  _list_append_deduplicate(ssafy_1_EXPORTED_TARGETS ${${ssafy_1_dep}_EXPORTED_TARGETS})
 endforeach()
 
 set(pkg_cfg_extras "ssafy_1-msg-extras.cmake")

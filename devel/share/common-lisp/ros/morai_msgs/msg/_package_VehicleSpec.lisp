@@ -1,12 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(SIZE-VAL
-          SIZE
-          WHEEL_BASE-VAL
-          WHEEL_BASE
-          MAX_STEERING-VAL
-          MAX_STEERING
-          OVERHANG-VAL
-          OVERHANG
-          REAR_OVERHANG-VAL
-          REAR_OVERHANG
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_VehicleSpec.lisp

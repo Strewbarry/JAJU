@@ -1,8 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(HEADER-VAL
-          HEADER
-          LIGHT-VAL
-          LIGHT
-          NUM_OF_LIGHT-VAL
-          NUM_OF_LIGHT
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_TrafficLight.lisp

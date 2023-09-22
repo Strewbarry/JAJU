@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import rospy
@@ -31,7 +31,7 @@ class IMGParser:
             # Byte 단위로 저장 된 이미지 데이터를 np.array 형태로 읽는 부분이다.
             # np.fromstring 함수를 이용하여 읽어오는 data 정보를 uint8 형태로 변환한다.
 
-            np_arr = np.fromstring(msg.data, np.uint8)
+            np_arr = np.frombuffer(msg.data, np.uint8)
 
 
             #TODO: (2)

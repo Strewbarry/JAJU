@@ -1,8 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(IS_CUSTOM_FILE_NAME-VAL
-          IS_CUSTOM_FILE_NAME
-          CUSTOM_FILE_NAME-VAL
-          CUSTOM_FILE_NAME
-          FILE_DIR-VAL
-          FILE_DIR
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_SaveSensorData.lisp

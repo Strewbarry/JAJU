@@ -1,7 +1,1 @@
-(cl:defpackage ssafy_1-msg
-  (:use )
-  (:export
-   "<STUDENT>"
-   "STUDENT"
-  ))
-
+/home/c104/catkin_ws/devel/.private/ssafy_1/share/common-lisp/ros/ssafy_1/msg/_package.lisp

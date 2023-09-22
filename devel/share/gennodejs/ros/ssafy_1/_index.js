@@ -1,7 +1,1 @@
-
-"use strict";
-
-module.exports = {
-  msg: require('./msg/_index.js'),
-  srv: require('./srv/_index.js')
-};
+/home/c104/catkin_ws/devel/.private/ssafy_1/share/gennodejs/ros/ssafy_1/_index.js

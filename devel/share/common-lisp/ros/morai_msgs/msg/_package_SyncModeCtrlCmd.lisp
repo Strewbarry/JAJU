@@ -1,8 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(FRAME-VAL
-          FRAME
-          COMMAND-VAL
-          COMMAND
-          SENSOR_CAPTURE-VAL
-          SENSOR_CAPTURE
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_SyncModeCtrlCmd.lisp

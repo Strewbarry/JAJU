@@ -1,8 +1,1 @@
-(cl:in-package ssafy_1-srv)
-(cl:export '(A-VAL
-          A
-          B-VAL
-          B
-          SUM-VAL
-          SUM
-))
+/home/c104/catkin_ws/devel/.private/ssafy_1/share/common-lisp/ros/ssafy_1/srv/_package_AddTwoInts.lisp

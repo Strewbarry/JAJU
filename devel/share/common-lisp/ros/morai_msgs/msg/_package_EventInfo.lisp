@@ -1,12 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(OPTION-VAL
-          OPTION
-          CTRL_MODE-VAL
-          CTRL_MODE
-          GEAR-VAL
-          GEAR
-          LAMPS-VAL
-          LAMPS
-          SET_PAUSE-VAL
-          SET_PAUSE
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_EventInfo.lisp

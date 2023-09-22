@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
+  "/home/c104/catkin_ws/devel/.private/ssafy_1/share/common-lisp/ros/ssafy_1/msg/student.lisp"
+  "/home/c104/catkin_ws/devel/.private/ssafy_1/share/common-lisp/ros/ssafy_1/srv/AddTwoInts.lisp"
   "CMakeFiles/ssafy_1_generate_messages_lisp"
-  "/home/kshssafy/catkin_ws/devel/share/common-lisp/ros/ssafy_1/msg/student.lisp"
-  "/home/kshssafy/catkin_ws/devel/share/common-lisp/ros/ssafy_1/srv/AddTwoInts.lisp"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -1,0 +1,8 @@
+prefix=/home/c104/catkin_ws/devel/.private/ssafy_2
+
+Name: ssafy_2
+Description: Description of ssafy_2
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: message_runtime

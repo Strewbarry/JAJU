@@ -1,10 +1,1 @@
-(cl:in-package ssafy_1-msg)
-(cl:export '(FIRST_NAME-VAL
-          FIRST_NAME
-          LAST_NAME-VAL
-          LAST_NAME
-          AGE-VAL
-          AGE
-          SCORE-VAL
-          SCORE
-))
+/home/c104/catkin_ws/devel/.private/ssafy_1/share/common-lisp/ros/ssafy_1/msg/_package_student.lisp

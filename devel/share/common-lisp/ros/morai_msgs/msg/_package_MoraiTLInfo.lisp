@@ -1,8 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(HEADER-VAL
-          HEADER
-          IDX-VAL
-          IDX
-          STATUS-VAL
-          STATUS
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_MoraiTLInfo.lisp

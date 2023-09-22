@@ -1,14 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(LONGLCMDTYPE-VAL
-          LONGLCMDTYPE
-          ACCEL-VAL
-          ACCEL
-          BRAKE-VAL
-          BRAKE
-          STEERING-VAL
-          STEERING
-          VELOCITY-VAL
-          VELOCITY
-          ACCELERATION-VAL
-          ACCELERATION
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_CtrlCmd.lisp

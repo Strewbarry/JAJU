@@ -1,4 +1,1 @@
-# generated from genmsg/cmake/pkg-msg-paths.cmake.develspace.in
-
-set(morai_msgs_MSG_INCLUDE_DIRS "/home/kshssafy/catkin_ws/src/morai_msgs/msg")
-set(morai_msgs_MSG_DEPENDENCIES geometry_msgs;std_msgs)
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/morai_msgs/cmake/morai_msgs-msg-paths.cmake

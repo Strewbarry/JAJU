@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #-*- coding:utf-8 -*-
 
 import rospy
@@ -235,21 +235,22 @@ if __name__ == '__main__':
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
-        xyz_p = Transformer.pc_np[:, 0:3]
-        xyz_p = np.insert(xyz_p,3,1,axis=1).T
-        xyz_p = np.delete(xyz_p,np.where(xyz_p[0,:]<0),axis=1)
-        xyz_p = np.delete(xyz_p,np.where(xyz_p[0,:]>10),axis=1)
-        xyz_p = np.delete(xyz_p,np.where(xyz_p[2,:]<-1.2),axis=1) #Ground Filter
-        #print(xyz_p[0])
+        if Transformer.pc_np is not None:
+            xyz_p = Transformer.pc_np[:, 0:3]
+            xyz_p = np.insert(xyz_p,3,1,axis=1).T
+            xyz_p = np.delete(xyz_p,np.where(xyz_p[0,:]<0),axis=1)
+            xyz_p = np.delete(xyz_p,np.where(xyz_p[0,:]>10),axis=1)
+            xyz_p = np.delete(xyz_p,np.where(xyz_p[2,:]<-1.2),axis=1) #Ground Filter
+            #print(xyz_p[0])
 
-        xyz_c = Transformer.transformLiDARToCamera(xyz_p)
-        #print(np.size(xyz_c[0]))
+            xyz_c = Transformer.transformLiDARToCamera(xyz_p)
+            #print(np.size(xyz_c[0]))
 
-        xy_i = Transformer.transformCameraToImage(xyz_c)
-        #print(np.size(xy_i[0]))
+            xy_i = Transformer.transformCameraToImage(xyz_c)
+            #print(np.size(xy_i[0]))
 
-        #TODO: (6) PointCloud가 Image에 투영된 Processed Image 시각화
-        xy_i = xy_i.astype(np.int32)
-        projectionImage = draw_pts_img(Transformer.img, xy_i[0,:], xy_i[1,:])        
-        cv2.imshow("LidartoCameraProjection", projectionImage)
-        cv2.waitKey(1)
+            #TODO: (6) PointCloud가 Image에 투영된 Processed Image 시각화
+            xy_i = xy_i.astype(np.int32)
+            projectionImage = draw_pts_img(Transformer.img, xy_i[0,:], xy_i[1,:])        
+            cv2.imshow("LidartoCameraProjection", projectionImage)
+            cv2.waitKey(1)

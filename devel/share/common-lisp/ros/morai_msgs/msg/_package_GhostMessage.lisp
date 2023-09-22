@@ -1,10 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(POSITION-VAL
-          POSITION
-          ROTATION-VAL
-          ROTATION
-          VELOCITY-VAL
-          VELOCITY
-          STEERING_ANGLE-VAL
-          STEERING_ANGLE
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_GhostMessage.lisp

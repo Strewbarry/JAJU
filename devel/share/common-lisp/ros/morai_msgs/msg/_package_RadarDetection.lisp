@@ -1,12 +1,1 @@
-(cl:in-package morai_msgs-msg)
-(cl:export '(DETECTION_ID-VAL
-          DETECTION_ID
-          POSITION-VAL
-          POSITION
-          AZIMUTH-VAL
-          AZIMUTH
-          RANGERATE-VAL
-          RANGERATE
-          AMPLITUDE-VAL
-          AMPLITUDE
-))
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/common-lisp/ros/morai_msgs/msg/_package_RadarDetection.lisp

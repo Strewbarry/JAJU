@@ -1,10 +1,1 @@
-(cl:defpackage ssafy_1-srv
-  (:use )
-  (:export
-   "ADDTWOINTS"
-   "<ADDTWOINTS-REQUEST>"
-   "ADDTWOINTS-REQUEST"
-   "<ADDTWOINTS-RESPONSE>"
-   "ADDTWOINTS-RESPONSE"
-  ))
-
+/home/c104/catkin_ws/devel/.private/ssafy_1/share/common-lisp/ros/ssafy_1/srv/_package.lisp

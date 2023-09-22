@@ -1,8 +1,1 @@
-
-"use strict";
-
-let AddTwoInts = require('./AddTwoInts.js')
-
-module.exports = {
-  AddTwoInts: AddTwoInts,
-};
+/home/c104/catkin_ws/devel/.private/ssafy_1/share/gennodejs/ros/ssafy_1/srv/_index.js

@@ -8,6 +8,7 @@ import niroImage from '../assets/niro.png';
 
 function CarList() {
   const [selectedCar, setSelectedCar] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const availableCars = location.state.availableCars;
@@ -26,10 +27,12 @@ function CarList() {
 
   // const cars = allCars.filter(car => availableCars.includes(car.id));
 
-  const handleCarSelection = (car) => {
+const handleCarSelection = (car) => {
     setSelectedCar(car);
-    localStorage.setItem('selectedCar', car.id); // 선택한 차량의 id만 localStorage에 저장합니다.
+    localStorage.setItem('selectedCarId', car.id); // 선택한 차량의 id만 localStorage에 저장합니다.
+    localStorage.setItem('selectedCarFee', car.total_fee.toString()); // 선택한 차량의 total_fee 값을 문자열로 변환하여 localStorage에 저장합니다.
 };
+
 
 
   useEffect(() => {

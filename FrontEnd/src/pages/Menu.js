@@ -70,6 +70,10 @@ function Menu() {
     navigate('/changeinfo');
   };
 
+  const goToSeeReservation = () => {
+    navigate('/seereservation');
+  };
+
 
 
   return (
@@ -81,7 +85,9 @@ function Menu() {
       {!token && <button className={styles.button} onClick={goToSignup}>회원가입</button>}
       {token && <button className={styles.button} onClick={handleLogout}>로그아웃</button>}
       {token && <button className={styles.button} onClick={goToChangeinfo}>회원정보변경</button>}
+      {token && <button className={styles.button} onClick={goToSeeReservation}>예약내역확인하기</button>}
       {token && <button className={`${styles.button} ${styles.deleteButton}`} onClick={openModal}>회원 탈퇴</button>}
+
       {isModalOpen && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>

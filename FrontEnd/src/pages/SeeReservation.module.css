@@ -1,0 +1,9 @@
+/* SeeReservation.module.css 파일에 추가 */
+.cancelButton {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    /* 추가적인 스타일링 */
+}

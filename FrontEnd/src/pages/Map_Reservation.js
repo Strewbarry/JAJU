@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Map.module.css';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON } from 'react-leaflet';
@@ -78,9 +79,26 @@ const markers = [
 const callVehicle = async (lat, lng) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.post('http://192.168.100.38:3000/vehicle/move/destination', { lat, lng }, {
+    const reservation_time = localStorage.getItem('reservation_time');
+    const return_time = localStorage.getItem('return_time');
+    const carType = localStorage.getItem('carType');
+
+    console.log(reservation_time)
+    console.log(return_time)
+    console.log(carType)
+
+
+    const postData = {
+      lat,
+      lng,
+      reservation_time,
+      return_time,
+      carType
+    };
+
+    const response = await axios.post('http://192.168.100.38:3000/reservation/make', postData, {
       headers: {
-        'authorization': token 
+        'authorization': token // 'Bearer' 없이 토큰을 직접 추가
       }
     });
     console.log(response.data);
@@ -91,11 +109,22 @@ const callVehicle = async (lat, lng) => {
 
 
 const RenderMarkers = () => {
+  const navigate = useNavigate();
+
+  const handleButtonClick = (lat, lng) => {
+    localStorage.setItem('selectedLatitude', lat); // 위도 저장
+    localStorage.setItem('selectedLongitude', lng); // 경도 저장
+    callVehicle(lat, lng); // 기존에 있던 호출 함수
+    navigate('/checkreservation'); // navigate 함수를 사용하여 /checkreservation로 이동
+  }
+
   return markers.map((marker, index) => (
     <Marker key={index} position={marker.position} icon={marker.icon}>
       <Popup>
         <b>{marker.label}</b>
-        <button onClick={() => callVehicle(marker.position[0], marker.position[1])}>이곳으로 호출하기</button> {/* Step 2: 버튼과 이벤트 핸들러를 추가합니다. */}
+        <button onClick={() => handleButtonClick(marker.position[0], marker.position[1])}>
+          이곳으로 호출하기
+        </button>
       </Popup>
     </Marker>
   ));
@@ -111,7 +140,7 @@ function Map() {
     console.log(selectedRegion); // 지역을 콘솔에 로깅
     if (selectedRegion) {
       switch (selectedRegion) {
-        case '상암':
+        case '서울':
           setCenter({ lat: 37.581897810470394, lng: 126.88914155948626 });
           break;
         case '부산':

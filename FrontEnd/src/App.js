@@ -9,9 +9,11 @@ import MapReservation from './pages/Map_Reservation';
 import Reservation from './pages/Reservation';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Changeinfo from './pages/Changeinfo';
 import Event from './pages/Event'
 import CarList from './pages/CarList';
 import CheckReservation from './pages/CheckReservation';
+import SeeReservation from './pages/SeeReservation';
 import Header from './Header';
 import Menu from './pages/Menu';
 import Footer from './Footer';
@@ -73,12 +75,14 @@ function App() {
         <Route path="/reservation" element={<Reservation />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/changeinfo" element={<Changeinfo />} />
         <Route path="/map" element={<Map />} />
         <Route path="/mapreservation" element={<MapReservation />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/event" element={<Event />} />
         <Route path="/carlist" element={<CarList />} />
         <Route path="/checkreservation" element={<CheckReservation />} />
+        <Route path="/seereservation" element={<SeeReservation />} />
         <Route path="/yangyang" element={<Yangyang />} />
         <Route path="/seoul" element={<Seoul />} />
         <Route path="/busan" element={<Busan />} />

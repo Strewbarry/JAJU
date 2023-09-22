@@ -9,7 +9,7 @@ function CheckReservation() {
     const [selectedCar, setSelectedCar] = useState('');
     const [selectedLatitude, setSelectedLatitude] = useState('');
     const [selectedLongitude, setSelectedLongitude] = useState('');
-    
+    const selectedCarFee = localStorage.getItem('selectedCarFee'); // 문자열로 저장된 값을 가져옵니다.
     useEffect(() => {
         setBookingDateTime(localStorage.getItem('bookingDateTime') || '');
         setReturnDateTime(localStorage.getItem('returnDateTime') || '');
@@ -26,20 +26,24 @@ function CheckReservation() {
         }
         
         try {
+            
             const response = await axios.post('http://192.168.100.38:3000/reservation/make', {
                 vehicle_id: selectedCar,
                 reservation_time: bookingDateTime,
                 return_time: returnDateTime,
                 lat: selectedLatitude,
                 lng: selectedLongitude,
-            }, {
+                price: selectedCarFee, // 가져온 값을 price 키의 값으로 설정합니다.
+            }, 
+            // 여기서 다른 설정이나 header 등이 필요하다면 계속 작성합니다.
+         {
                 headers: {
                     'authorization': token
                 }
             });
             console.log('Reservation Confirmation Response:', response.data);
             if (response.status === 200){
-                alert('예약이 완료되엇습니다')
+                alert('예약이 완료되었습니다')
             }
         } catch (error) {
             console.error('Reservation Confirmation Error:', error);
@@ -55,6 +59,7 @@ function CheckReservation() {
                 <p>반납 시간: {returnDateTime.replace('T', ' ')}</p>
                 <p>선택한 차량: {selectedCar}</p>
                 <p>호출할 지역: 위도 {selectedLatitude}, 경도 {selectedLongitude}</p>
+                <p>예상 가격: {selectedCarFee}</p>
             </div>
             
             <button onClick={handleReservationConfirmation} className={styles.confirmButton}>

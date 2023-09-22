@@ -11,11 +11,11 @@ import pathData from '../Path.json';
 
 import placeholderImage from '../assets/placeholder.png'
 import HotelImage from '../assets/Hotel.png';
-import MBCImage from '../assets/MBC.png';
+
 import coffeeImage from '../assets/coffee.png';
-import samsungImage from '../assets/samsung.png';
+
 import restaurantImage from '../assets/restaurant.png';
-import stationImage from '../assets/station.png';
+
 import swimImage from '../assets/swimmer.png';
 import beerImage from '../assets/beer.png';
 
@@ -29,11 +29,11 @@ const createIcon = (iconUrl) => new L.Icon({
 
 const defaultIcon = createIcon(placeholderImage);
 const hotelIcon = createIcon(HotelImage);
-const MBCIcon = createIcon(MBCImage);
+
 const coffeeIcon = createIcon(coffeeImage);
-const samsungIcon = createIcon(samsungImage);
+
 const restaurantIcon = createIcon(restaurantImage);
-const stationIcon = createIcon(stationImage);
+
 const swimIcon = createIcon(swimImage);
 const beerIcon = createIcon(beerImage);
 
@@ -54,7 +54,24 @@ const markers = [
 const callVehicle = async (lat, lng) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.post('http://192.168.100.38:3000/vehicle/move/destination', { lat, lng }, {
+    const reservation_time = localStorage.getItem('reservation_time');
+    const return_time = localStorage.getItem('return_time');
+    const carType = localStorage.getItem('carType');
+
+    console.log(reservation_time)
+    console.log(return_time)
+    console.log(carType)
+
+
+    const postData = {
+      lat,
+      lng,
+      reservation_time,
+      return_time,
+      carType
+    };
+
+    const response = await axios.post('http://192.168.100.38:3000/reservation/make', postData, {
       headers: {
         'authorization': token // 'Bearer' 없이 토큰을 직접 추가
       }
@@ -66,12 +83,14 @@ const callVehicle = async (lat, lng) => {
 };
 
 
+
+
 const RenderMarkers = () => {
   return markers.map((marker, index) => (
     <Marker key={index} position={marker.position} icon={marker.icon}>
       <Popup>
         <b>{marker.label}</b>
-        <button onClick={() => callVehicle(marker.position[0], marker.position[1])}>이곳으로 호출하기</button> {/* Step 2: 버튼과 이벤트 핸들러를 추가합니다. */}
+        <button onClick={() => callVehicle(marker.position[0], marker.position[1])}>이곳으로 호출하기</button> 
       </Popup>
     </Marker>
   ));
@@ -86,6 +105,14 @@ function Map() {
    
   this.ros.on('connection', (connection) => {
     console.log('connection')
+  })
+
+  this.ros.on('error', (connection) => {
+    console.log('에러')
+  })
+
+  this.ros.on('close', (connection) => {
+    console.log('닫기')
   })
 
   let global_path_listener =new ROSLIB.Topic({

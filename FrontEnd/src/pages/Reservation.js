@@ -11,13 +11,50 @@ const Reservation = () => {
   const [returnDate, setReturnDate] = useState('');
   const [returnTime, setReturnTime] = useState('');
   const [returnMinutes, setReturnMinutes] = useState('');
-  const [availableCars, setAvailableCars] = useState([1, 2, 3]); 
+  const [availableCars, setAvailableCars] = useState(null); 
   const [showModal, setShowModal] = useState(false);
 
   const regions = ['서울', '부산', '제주','강릉','대전','광주','구미','K-city'];
   const times = Array.from({length: 24}, (_, i) => i < 10 ? `0${i}` : `${i}`);
   const minutesOptions = ['00', '30'];
 
+    // 예약 날짜 및 시간 변경 핸들러
+    const handleBookingDateChange = (e) => {
+      setBookingDate(e.target.value);
+      const fullBookingDateTime = `${e.target.value} ${bookingTime}:${bookingMinutes}`; // 'T'를 공백으로 바꿈
+      localStorage.setItem('bookingDateTime', fullBookingDateTime);
+    };
+  
+    const handleBookingTimeChange = (e) => {
+      setBookingTime(e.target.value);
+      const fullBookingDateTime = `${bookingDate}T${e.target.value}:${bookingMinutes}`;
+      localStorage.setItem('bookingDateTime', fullBookingDateTime);
+    };
+  
+    const handleBookingMinutesChange = (e) => {
+      setBookingMinutes(e.target.value);
+      const fullBookingDateTime = `${bookingDate}T${bookingTime}:${e.target.value}`;
+      localStorage.setItem('bookingDateTime', fullBookingDateTime);
+    };
+  
+    // 반납 날짜 및 시간 변경 핸들러
+    const handleReturnDateChange = (e) => {
+      setReturnDate(e.target.value);
+      const fullReturnDateTime = `${e.target.value} ${returnTime}:${returnMinutes}`; // 'T'를 공백으로 바꿈
+      localStorage.setItem('returnDateTime', fullReturnDateTime);
+    };
+  
+    const handleReturnTimeChange = (e) => {
+      setReturnTime(e.target.value);
+      const fullReturnDateTime = `${returnDate}T${e.target.value}:${returnMinutes}`;
+      localStorage.setItem('returnDateTime', fullReturnDateTime);
+    };
+  
+    const handleReturnMinutesChange = (e) => {
+      setReturnMinutes(e.target.value);
+      const fullReturnDateTime = `${returnDate}T${returnTime}:${e.target.value}`;
+      localStorage.setItem('returnDateTime', fullReturnDateTime);
+    };
   const handleFindVehicle = async () => {
     if (!region || !bookingDate || !bookingTime || !bookingMinutes || !returnDate || !returnTime || !returnMinutes) {
       alert('지역과 날짜를 입력해주세요.');
@@ -38,9 +75,9 @@ const Reservation = () => {
       });
       console.log(response.data);
 
-      const availableCarIds = response.data.map(da => da.car_info_id);
+      const availableCarIds = response.data
       setAvailableCars(availableCarIds);
-
+      console.log(availableCarIds);
       if (availableCarIds.length === 0) {
         setShowModal(true);
       }
@@ -72,14 +109,15 @@ const Reservation = () => {
       });
       console.log(response.data);
   
-      const availableCarIds = response.data.map(da => da.car_info_id);
+      const availableCarIds = response.data
       setAvailableCars(availableCarIds);
   
       // 차량이 없는 경우 모달을 띄우고, 차량이 있는 경우에만 /carlist로 이동합니다.
       if (availableCarIds.length === 0) {
         setShowModal(true);
       } else {
-        navigate('/carlist', { state: { availableCars } });
+        console.log(availableCarIds)
+        navigate('/carlist', { state: { availableCars: response.data } } );
       }
   
     } catch (error) {
@@ -96,14 +134,7 @@ const Reservation = () => {
   
 return (
     <div className={styles.reservationContainer}>
-        {showModal && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <span className={styles.closeButton} onClick={() => setShowModal(false)}>X</span>
-            이용할 수 있는 차량이 없습니다.
-          </div>
-        </div>
-      )}
+
       <div className={styles.field}>
         <label>지역: </label>
           <select value={region} onChange={handleRegionChange}>
@@ -120,17 +151,17 @@ return (
           <input 
             type="date" 
             value={bookingDate} 
-            onChange={(e) => setBookingDate(e.target.value)} 
+            onChange={handleBookingDateChange} 
             max="2025-12-31" 
             className={styles.dateInput}
           />
-          <select value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className={styles.timeInput}>
+          <select value={bookingTime} onChange={handleBookingTimeChange} className={styles.timeInput}>
             <option value="" disabled>시</option>
             {times.map((t, index) => (
               <option key={index} value={t}>{t}</option>
             ))}
           </select>
-          <select value={bookingMinutes} onChange={(e) => setBookingMinutes(e.target.value)} className={styles.timeInput}>
+          <select value={bookingMinutes} onChange={handleBookingMinutesChange} className={styles.timeInput}>
             <option value="" disabled>분</option>
             {minutesOptions.map((m, index) => (
               <option key={index} value={m}>{m}</option>
@@ -145,17 +176,17 @@ return (
           <input 
             type="date" 
             value={returnDate} 
-            onChange={(e) => setReturnDate(e.target.value)} 
+            onChange={handleReturnDateChange} 
             max="2025-12-31" 
             className={styles.dateInput}
           />
-          <select value={returnTime} onChange={(e) => setReturnTime(e.target.value)} className={styles.timeInput}>
+          <select value={returnTime} onChange={handleReturnTimeChange} className={styles.timeInput}>
             <option value="" disabled>시</option>
             {times.map((t, index) => (
               <option key={index} value={t}>{t}</option>
             ))}
           </select>
-          <select value={returnMinutes} onChange={(e) => setReturnMinutes(e.target.value)} className={styles.timeInput}>
+          <select value={returnMinutes} onChange={handleReturnMinutesChange} className={styles.timeInput}>
             <option value="" disabled>분</option>
             {minutesOptions.map((m, index) => (
               <option key={index} value={m}>{m}</option>
@@ -169,6 +200,14 @@ return (
           <button onClick={handleFindVehicle} className={styles.findVehicleButton}>콘솔로 찍어보기</button>
         </div>
       </div>
+      {showModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <span className={styles.closeButton} onClick={() => setShowModal(false)}>X</span>
+            이용할 수 있는 차량이 없습니다.
+          </div>
+        </div>
+      )}
     </div>
   );
 };

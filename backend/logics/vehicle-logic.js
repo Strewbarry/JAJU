@@ -7,9 +7,18 @@ exports.find = async (req, res) => {
     const start_time = new Date(req.body.start_time)
     const end_time = new Date(req.body.end_time)
     console.log(start_time, end_time)
+    const between_time = (end_time - start_time) / 3600000
+    console.log(between_time)
     let vehicle_list = []
     console.log(start_time, end_time)
-
+    const car_info = await new Promise((resolve, reject) => {
+        
+        connection.query('SELECT * from car_info;', function (error, results, fields) {
+            if (error) reject(error);
+            resolve(results);
+        });
+    });
+    console.log(car_info)
     try {
         const sql = 'SELECT * from vehicle WHERE (`around_location`=?);'
         const params = [req.body.around_location]
@@ -21,7 +30,7 @@ exports.find = async (req, res) => {
             });
         });
 
-        console.log('d', results);
+        // console.log('d', results);
         
 
         for (const vehi_id of results) {
@@ -51,6 +60,9 @@ exports.find = async (req, res) => {
                 }
             }
             if (reservate_able === true) {
+                // console.log(between_time*car_info[vehi_id.car_info_id].fee_per_hour)
+                vehi_id.total_fee = between_time*car_info[vehi_id.car_info_id-1].fee_per_hour
+                // console.log(vehi_id)
                 vehicle_list.push(vehi_id)
             }
         }

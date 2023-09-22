@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 
 
 const crypto = require("crypto");
+const { resolve } = require("path");
 
 
 // 회원 가입
@@ -37,7 +38,7 @@ exports.idcheck = async (req, res) => {
         // 해당 열에 해당하는 데이터가 있다면 중복된 것이기 때문에
         if (results.length === 1) {
             // 중복 메세지 전달
-            res.status(501).json('중복됨')
+            res.status(205).json('중복됨')
         }
         // 없다면 사용 가능 메세지 전달
         else {
@@ -96,12 +97,36 @@ exports.get_reservation = async (req, res) => {
     
     // 찾은 유저 id를 통해 그 유저의 예약한 리스트들 조회
     const sql = 'SELECT * FROM reservation WHERE (`user_id` = ?);'
-    const params = [user_id]
-    connection.query(sql, params, function(error, results, fields) {
-        if (error) throw error
-        console.log(user_id)
-        res.status(200).json(results)
+    const params = [user_id[0].id]
+    console.log(user_id[0].id)
+    const reservation_list = await new Promise((resolve, reject) => {
+        connection.query(sql, params, function(error, results, fields) {
+            if (error) reject(error)
+            console.log(user_id)
+            console.log(results)
+            resolve(results)
+        })
     })
+    console.log(reservation_list)
+
+    for (const reser of reservation_list) {
+        console.log(reser.vehicle_id)
+        const sql2 = 'SELECT car_info_id, car_number from vehicle WHERE (`id`=?);'
+        const car_info = await new Promise((resolve, reject) => {
+            connection.query(sql2, reser.vehicle_id, function (error, results, fields) {
+                if (error) reject(error);
+                
+                resolve(results);
+            });
+        })
+        console.log(car_info)
+        reser.car_info = car_info
+        console.log(reser)
+    }
+
+
+    res.status(200).json(reservation_list)
+    
 }
 
 // 로그인
@@ -109,7 +134,7 @@ exports.login = async (req, res) => {
     try {
       const params = [req.body.email]
       // 입력한 이메일이 데이터베이스에 있는지 확인
-      let sql = "select * from `user` where email=?";
+      let sql = "select * from `user` where email=?;"
   
       const result = await new Promise((resolve, reject) => {
         connection.query(sql, params, function (error, results, fields) {

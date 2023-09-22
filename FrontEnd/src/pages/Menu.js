@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Menu.module.css'; 
 import axios from 'axios'; // axios를 import합니다.
 
+
 function Menu() {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
@@ -65,9 +66,11 @@ function Menu() {
     navigate('/signup');
   };
 
-  const goToCheckReservation = () => {
-    navigate('/checkreservation');
+  const goToChangeinfo = () => {
+    navigate('/changeinfo');
   };
+
+
 
   return (
     <div className={styles.container}>
@@ -77,7 +80,7 @@ function Menu() {
       {!token && <button className={styles.button} onClick={goToLogin}>로그인</button>}
       {!token && <button className={styles.button} onClick={goToSignup}>회원가입</button>}
       {token && <button className={styles.button} onClick={handleLogout}>로그아웃</button>}
-      {token && <button className={styles.button} onClick={goToCheckReservation}>예약내역 확인</button>}
+      {token && <button className={styles.button} onClick={goToChangeinfo}>회원정보변경</button>}
       {token && <button className={`${styles.button} ${styles.deleteButton}`} onClick={openModal}>회원 탈퇴</button>}
       {isModalOpen && (
         <div className={styles.modal}>

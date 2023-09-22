@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './CarList.module.css'; 
 
@@ -11,31 +11,53 @@ function CarList() {
   const navigate = useNavigate();
   const location = useLocation();
   const availableCars = location.state.availableCars;
-
+  // console.log(availableCars)
+  const ablecars = []
+  availableCars.forEach((car) => {
+    ablecars.push(car)
+  })
+  // console.log(ablecars)
   const allCars = [
+    { id: 1, name: "Niro", src: niroImage },
     { id: 2, name: "K5", src: k5Image },
     { id: 3, name: "Starex", src: starexImage },
-    { id: 1, name: "Niro", src: niroImage },
   ];
+  
 
-  const cars = allCars.filter(car => availableCars.includes(car.id));
+  // const cars = allCars.filter(car => availableCars.includes(car.id));
 
   const handleCarSelection = (car) => {
-    setSelectedCar(car.name);
-  };
+    setSelectedCar(car);
+    localStorage.setItem('selectedCar', car.id); // 선택한 차량의 id만 localStorage에 저장합니다.
+};
 
+
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 localStorage에서 예약 시간과 반납 시간을 가져와 console에 찍습니다.
+    const bookingDateTime = localStorage.getItem('bookingDateTime');
+    const returnDateTime = localStorage.getItem('returnDateTime');
+    console.log('예약 시간:', bookingDateTime);
+    console.log('반납 시간:', returnDateTime);
+  }, []);
+  
   return (
     <div>
       <div className={styles.carList}>
-        {cars.length > 0 ? (
-          cars.map((car, index) => (
+        {availableCars.length > 0 ? (
+          availableCars.map((availableCar, index) => (
             <div key={index} className={styles.carItem}>
-              <img src={car.src} alt={car.name} className={styles.carImage} />
+              <div>{index + 1}</div>
+              <img 
+                src={allCars[availableCar.car_info_id - 1].src} 
+                alt={allCars[availableCar.car_info_id - 1].name} 
+                className={styles.carImage} 
+              />
+              <div>{availableCar.fuel_left}km 주행 가능</div>
               <button 
-                onClick={() => handleCarSelection(car)} 
+                onClick={() => handleCarSelection(availableCar)} 
                 className={styles.button}
               >
-                {car.name} 선택
+                {allCars[availableCar.car_info_id - 1].name} 선택
               </button>
             </div>
           ))
@@ -46,10 +68,11 @@ function CarList() {
           </div>
         )}
       </div>
-      {selectedCar && <p>선택한 차량: {selectedCar}</p>}
-      {cars.length > 0 && <button onClick={() => navigate('/mapreservation')} className={styles.navigateButton}>호출할 지역 선택하기</button>}
+      {selectedCar && <p>예상가격: {selectedCar.total_fee}원 </p>}
+      <button onClick={() => navigate('/mapreservation')} className={styles.navigateButton}>호출할 지역 선택하기</button>
     </div>
-  );
+);
+
 }
 
 export default CarList;

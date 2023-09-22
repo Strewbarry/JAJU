@@ -12,13 +12,13 @@ exports.make = async (req, res) => {
     const reservation_time = new Date(req.body.reservation_time)
     const return_time = new Date(req.body.return_time)
 
-    const sql = 'INSERT INTO reservation (`user_id`, `vehicle_id`, `reservation_time`, `return_time`, `get_location`) VALUES (?,?,?,?,?)'
-    const params = [user_id[0].id, req.body.vehicle_id, reservation_time, return_time, req.body.get_location]
+    const sql = 'INSERT INTO reservation (`user_id`, `vehicle_id`, `reservation_time`, `return_time`, `lat`, `lng`, `price`) VALUES (?,?,?,?,?,?,?)'
+    const params = [user_id[0].id, req.body.vehicle_id, reservation_time, return_time, req.body.lat, req.body.lng, req.body.price]
 
     connection.query(sql, params, function (error, results, fields) {
         if (error) throw error;
         
-        // console.log('새로 추가', results)
+        console.log('새로 추가', results)
         res.status(200).json(results)
     })
 }

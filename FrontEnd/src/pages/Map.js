@@ -83,8 +83,6 @@ const callVehicle = async (lat, lng) => {
 };
 
 
-
-
 const RenderMarkers = () => {
   return markers.map((marker, index) => (
     <Marker key={index} position={marker.position} icon={marker.icon}>

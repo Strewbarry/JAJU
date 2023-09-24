@@ -58,7 +58,7 @@ function MainPage() {
     <div>
       <div className="map-buttons">
         <button onClick={goToMap}>바로 이용가능한 차량 보기</button>
-        <button onClick={goToReservation}>예약 페이지로 이동</button>
+        <button onClick={goToReservation}>예약하기</button>
         <button onClick={goToEvent}>이벤트</button>
       </div>
       <Recommended />

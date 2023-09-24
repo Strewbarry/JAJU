@@ -19,7 +19,7 @@ function Header() {
   };
 
   return (
-    <header className={styles.header}>
+    <header className={styles.header_t}>
       <img 
         src={menuIcon} 
         alt="메뉴 아이콘" 

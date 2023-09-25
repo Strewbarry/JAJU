@@ -23,6 +23,9 @@ app.use('/vehicle', vehicleRoutes)
 // reservation으로 시작한다면 reservationRouter로 이동
 const reservationRoutes = require("./routes/reservation-router")
 app.use('/reservation', reservationRoutes)
+// travel로 시작한다면 travelRouter로 이동
+const traverlRoutes = require("./routes/travel-router")
+app.use('/travel', traverlRoutes)
 
 // 3000번 포트에 관해서 요청 듣고 있기
 app.listen(app.get('port'), () => {

@@ -5,39 +5,45 @@ import styles from './SeeReservation.module.css';
 function SeeReservation() {
     const [reservations, setReservations] = useState([]);
     const [error, setError] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
+    const [selectedId, setSelectedId] = useState(null); // 삭제할 예약 ID를 임시 저장하기 위한 상태
 
-    const handleCancelReservation = async (id) => {
+    const handleCancelReservation = (id) => {
         const token = localStorage.getItem('token');
         if (!token) {
             setError('User is not authenticated');
             return;
         }
-        
-        // 사용자에게 취소 확인 메시지를 보여줍니다.
-        const isConfirmed = window.confirm('정말 취소하시겠습니까?');
-        
-        if (!isConfirmed) {
-            return; // 사용자가 취소를 확인하지 않았다면 함수를 종료합니다.
-        }
+
+        setSelectedId(id);
+        setModalMessage("정말 취소하시겠습니까?");
+        setShowModal(true);
+    };
+
+    const handleConfirm = async () => {
         try {
-            await axios.delete(`http://192.168.100.38:3000/reservation/delete/${id}`, {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://192.168.100.38:3000/reservation/delete/${selectedId}`, {
                 headers: { 'authorization': token }
             });
-            
-            // 예약이 성공적으로 취소되면, 취소된 예약을 목록에서 제거합니다.
-            setReservations(reservations => reservations.filter(reservation => reservation.id !== id));
-            
-            // 사용자에게 예약 취소 알림을 띄웁니다.
-            window.alert('예약이 취소되었습니다.');
+
+            setReservations(reservations => reservations.filter(reservation => reservation.id !== selectedId));
+
         } catch (err) {
             console.error(err);
             setError('Error cancelling the reservation');
         }
-    };
-    
+    }
+
+    const handleCancel = () => {
+        setSelectedId(null);
+        setShowModal(false);
+    }
+
     useEffect(() => {
         const fetchReservations = async () => {
-            const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+            const token = localStorage.getItem('token'); 
             if(!token) {
                 setError('User is not authenticated');
                 return;
@@ -49,7 +55,6 @@ function SeeReservation() {
                 });
                 
                 setReservations(response.data);
-                console.log(response.data)
             } catch (err) {
                 console.error(err);
                 setError('Error fetching reservation data');
@@ -76,16 +81,22 @@ function SeeReservation() {
                         <p>예상 가격:{reservation.price}원</p>
                         <p>차량 번호: {reservation.car_info[0].car_number}</p>
                         <button onClick={() => handleCancelReservation(reservation.id)} className={styles.cancelButton}>예약 취소하기</button>
-                        <br/>
-                        <br/>
-                        <br/>
-                        
-                        <hr/>
                     </div>
                     
                 ))
             ) : (
                 <p>No reservations found</p>
+            )}
+            
+            {showModal && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <span className={styles.closeButton} onClick={handleCancel}>X</span>
+                        {modalMessage}
+                        <button onClick={handleConfirm}>확인</button>
+                        <button onClick={handleCancel}>취소</button>
+                    </div>
+                </div>
             )}
         </div>
     )

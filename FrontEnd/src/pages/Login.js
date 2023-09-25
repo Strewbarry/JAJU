@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './Login.module.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+// import {Url} from '../server_url';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ function Login() {
   const [modalMessage, setModalMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-
+  // const url = Url
   
 
   const handleSubmit = async (e) => {
@@ -21,7 +22,8 @@ function Login() {
       password,
     };
 
-    try {
+    try { // 집 가서 Localhost 로 바꾸기
+      // const response = await axios.post(`${url}user/login`, userData);
       const response = await axios.post('http://192.168.100.38:3000/user/login', userData);
 
       if (response.status === 200) {
@@ -117,3 +119,5 @@ const modalContentStyles = {
 };
 
 export default Login;
+
+

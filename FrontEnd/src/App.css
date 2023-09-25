@@ -1,20 +1,42 @@
+
+
+body {
+  background-color: #f7e6f3; /* 밝은 자주빛 배경색 */
+}
+
 /* 모든 버튼에 공통적으로 적용할 기본 스타일 */
 .map-buttons button {
-  width: 100%; /* 버튼의 가로 길이를 꽉 차게 설정 */
-  margin: 5px 0; /* 버튼 사이에 약간의 간격을 둠 */
-  padding: 15px; /* 버튼 내부의 패딩을 추가 */
-  font-size: 16px; /* 폰트 크기 설정 */
+  position: relative; 
+  width: 90%; 
+  margin: 5px 0; 
+  padding: 15px; 
+  font-size: 25px;
+  font-family: 'Nanum Pen Script', cursive;
+  background: linear-gradient(45deg, #9b47c9, #b76ce3); /* 진한 연보라빛 그라데이션 적용 */
+  border: 2px solid #9b47c9; /* 테두리 추가 */
+  border-radius: 8px; 
+
+  cursor: pointer; 
+  transition: 0.3s; 
 }
+
+.map-buttons button:hover {
+  background: linear-gradient(45deg, #7f2da8, #9f60ca);
+}
+
+
+
 
 /* 첫 번째 버튼 스타일 */
 .map-buttons button:first-child {
   position: absolute; /* 절대 위치 지정 */
-  top: 20%; /* 버튼을 중간보다 약간 위쪽에 위치시킴 */
-  left: 0; /* 왼쪽 정렬 */
+  top: 28%; /* 버튼을 화면의 중앙에 위치시킴 */
+  left: 50%; /* 버튼을 화면의 중앙에 위치시킴 */
+  transform: translate(-50%, -50%); /* 버튼의 중앙을 기준으로 화면의 중앙에 위치시킴 */
 
-  
+  width: 90%; /* 버튼의 가로 길이 */
   height: 100px; /* 버튼의 높이 설정 */
-  margin-right: 20px; /* 오른쪽 마진 추가 */
+  padding-right: 100px; /* 오른쪽 공백 추가 */
   background-image: url('../src/assets/hatchback.png'); /* 배경 이미지 추가 */
   background-size: contain; /* 배경 이미지를 버튼 크기에 맞게 조정 */
   background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
@@ -26,19 +48,26 @@
 /* 두 번째 및 세 번째 버튼 스타일 */
 .map-buttons button:nth-child(2),
 .map-buttons button:nth-child(3) {
-  width: 48%; /* 버튼 가로 길이를 반으로 설정 (간격 때문에 약간 줄임) */
+  width: 44%; /* 버튼 가로 길이를 반으로 설정 (간격 때문에 약간 줄임) */
   position: absolute; /* 절대 위치 지정 */
   top: 40%; /* 첫 번째 버튼 아래에 위치 */
+  padding-left: 50px; /* 오른쪽 공백 추가 */
 }
 
 /* 두 번째 버튼 스타일: 왼쪽에 배치 */
 .map-buttons button:nth-child(2) {
-  left: 5px; /* 왼쪽 정렬 */
+  left: 20px; /* 왼쪽 정렬 */
+  background-image: url('../src/assets/time.png'); /* 배경 이미지 추가 */
+  background-size: contain; /* 배경 이미지를 버튼 크기에 맞게 조정 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
 }
 
 /* 세 번째 버튼 스타일: 오른쪽에 배치 */
 .map-buttons button:nth-child(3) {
-  right: 5px; /* 오른쪽 정렬 */
+  right: 20px; /* 오른쪽 정렬 */
+  background-image: url('../src/assets/gift-fill.png'); /* 배경 이미지 추가 */
+  background-size: contain; /* 배경 이미지를 버튼 크기에 맞게 조정 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
   
 }
 

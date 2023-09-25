@@ -1,0 +1,29 @@
+/* 자주빛 테마 적용 */
+.eventContainer {
+    background-color: #f7e6f3; /* 밝은 자주빛 배경색 */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 60px;
+  }
+  
+  .eventTitle {
+    color: #9b59b6; /* 강렬한 자주빛 */
+    font-family: 'Arial', sans-serif; /* 원하는 폰트로 변경 가능 */
+    margin-bottom: 10px;
+  }
+  
+  .eventPeriod {
+    color: #8e44ad;
+    margin-bottom: 5px;
+  }
+  
+  .eventDescription {
+    color: #9b59b6;
+  }
+  
+  .eventSeparator {
+    border: 0.5px solid #d3b1e0; /* 자주빛 선 */
+    margin: 20px 0;
+  }
+  

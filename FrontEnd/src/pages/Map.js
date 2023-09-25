@@ -66,8 +66,8 @@ const callVehicle = async (lat, lng) => {
     const postData = {
       lat,
       lng,
-      reservation_time,
-      return_time,
+      // reservation_time,
+      // return_time,
       carType
     };
 
@@ -81,7 +81,6 @@ const callVehicle = async (lat, lng) => {
     console.error('Error:', error);
   }
 };
-
 
 const RenderMarkers = () => {
   return markers.map((marker, index) => (

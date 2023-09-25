@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './Reservation.module.css';
 import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
@@ -17,6 +17,30 @@ const Reservation = () => {
   const regions = ['서울', '부산', '제주','강릉','대전','광주','구미','K-city'];
   const times = Array.from({length: 24}, (_, i) => i < 10 ? `0${i}` : `${i}`);
   const minutesOptions = ['00', '30'];
+
+  // 현재 날짜 및 시간 얻기
+  const currentDate = new Date();
+  const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+  const currentHour = currentDate.getHours();
+
+  const checkValidTime = () => {
+    if (!bookingDate || !returnDate || !bookingTime || !returnTime) return;  // 초기 상태 및 필요한 값이 없는 경우 검사를 건너뜁니다.
+
+    if (bookingDate === formattedDate && bookingTime <= currentHour) {
+      setBookingTime('');
+      alert('예약 시간이 현재 시간 이전입니다. 다른 시간을 선택해주세요.');
+    }
+
+    if (bookingDate === returnDate && returnTime <= bookingTime) {
+      setReturnTime('');
+      alert('반납 시간이 예약 시간과 동일하거나 이전입니다. 다른 시간을 선택해주세요.');
+    }
+};
+
+
+  useEffect(() => {
+    checkValidTime();
+  }, [bookingTime, returnTime]);
 
     // 예약 날짜 및 시간 변경 핸들러
     const handleBookingDateChange = (e) => {
@@ -152,6 +176,7 @@ return (
             type="date" 
             value={bookingDate} 
             onChange={handleBookingDateChange} 
+            min={formattedDate}
             max="2025-12-31" 
             className={styles.dateInput}
           />
@@ -177,6 +202,7 @@ return (
             type="date" 
             value={returnDate} 
             onChange={handleReturnDateChange} 
+            min={bookingDate ? bookingDate : formattedDate} 
             max="2025-12-31" 
             className={styles.dateInput}
           />

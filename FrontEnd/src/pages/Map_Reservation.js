@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Map.module.css';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON, useMap } from 'react-leaflet';
 import osm from "../osm-providers";
 import osm2 from "../osm-providers2";
 import 'leaflet/dist/leaflet.css';
@@ -70,7 +70,7 @@ const markers = [
   { position: [35.114751, 129.043291], icon: defaultIcon, label: '부산역' },
   { position: [35.117730, 129.041295], icon: defaultIcon, label: '대건명가돼지국밥' },
   { position: [35.116212, 129.041592], icon: defaultIcon, label: '아스티호텔 4성급' },
-  { position: [35.116263, 129.040803], icon: defaultIcon, label: '제주 스타벅스' },
+  { position: [35.116263, 129.040803], icon: defaultIcon, label: '부산 스타벅스' },
   { position: [35.120741, 129.039271], icon: defaultIcon, label: '개미집 부산역점' },
 
 
@@ -88,25 +88,17 @@ const callVehicle = async (lat, lng) => {
     console.log(carType)
 
 
-    const postData = {
-      lat,
-      lng,
-      reservation_time,
-      return_time,
-      carType
-    };
-
-    const response = await axios.post('http://192.168.100.38:3000/reservation/make', postData, {
-      headers: {
-        'authorization': token // 'Bearer' 없이 토큰을 직접 추가
-      }
-    });
-    console.log(response.data);
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
+
+function UpdateCenter({ center }) {
+  const map = useMap();
+  map.setView(center);
+  return null;
+}
 
 const RenderMarkers = () => {
   const navigate = useNavigate();
@@ -130,6 +122,8 @@ const RenderMarkers = () => {
   ));
 };
 
+
+
 function Map() {
   const [clickedPosition, setClickedPosition] = useState(null);
   const [mapType, setMapType] = useState('normal');
@@ -146,7 +140,7 @@ function Map() {
         case '부산':
           setCenter({ lat: 35.117191, lng: 129.038916 });
           break;
-        case '제주도':
+        case '제주':
           setCenter({ lat: 33.511751, lng: 126.498355 });
           break;
         // 필요한 경우 여기에 더 많은 경우를 추가하세요
@@ -156,9 +150,6 @@ function Map() {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("현재 center:", center); // center 값을 콘솔에 로깅
-  }, [center]);
 
   const MapEvents = () => {
     useMapEvents({
@@ -185,9 +176,9 @@ function Map() {
         <div className={`${styles.col} ${styles.textCenter}`}>
           <div className={styles.col}>
             <MapContainer center={center} zoom={ZOOM_LEVEL} className={styles.mapContainer}>
+              <UpdateCenter center={center} />
               <div className={styles.mapButtons}>
-                <button onClick={() => setMapType('normal')}>일반지도</button>
-                <button onClick={() => setMapType('satellite')}>위성지도</button>
+                {/* ... */}
               </div>
               <TileLayer 
                 url={mapType === 'normal' ? osm.maptiler.url : osm2.maptiler.url} 
@@ -209,9 +200,6 @@ function Map() {
       </div>
     </div>
   );
-  
 }
-
-
 
 export default Map;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './CheckReservation.module.css';
 
@@ -10,6 +11,7 @@ function CheckReservation() {
     const [selectedLatitude, setSelectedLatitude] = useState('');
     const [selectedLongitude, setSelectedLongitude] = useState('');
     const selectedCarFee = localStorage.getItem('selectedCarFee'); // 문자열로 저장된 값을 가져옵니다.
+    const navigate = useNavigate();
     useEffect(() => {
         setBookingDateTime(localStorage.getItem('bookingDateTime') || '');
         setReturnDateTime(localStorage.getItem('returnDateTime') || '');
@@ -21,7 +23,7 @@ function CheckReservation() {
     const handleReservationConfirmation = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            console.error('User is not authenticated');
+            console.error('로그인 후 이용해주세요');
             return;
         }
         
@@ -33,17 +35,17 @@ function CheckReservation() {
                 return_time: returnDateTime,
                 lat: selectedLatitude,
                 lng: selectedLongitude,
-                price: selectedCarFee, // 가져온 값을 price 키의 값으로 설정합니다.
+                price: selectedCarFee,
             }, 
-            // 여기서 다른 설정이나 header 등이 필요하다면 계속 작성합니다.
-         {
-                headers: {
-                    'authorization': token
-                }
-            });
+            {
+                headers: { 'authorization': token }
+            }
+            
+);
             console.log('Reservation Confirmation Response:', response.data);
             if (response.status === 200){
                 alert('예약이 완료되었습니다')
+                navigate('/seereservation')
             }
         } catch (error) {
             console.error('Reservation Confirmation Error:', error);
@@ -59,7 +61,7 @@ function CheckReservation() {
                 <p>반납 시간: {returnDateTime.replace('T', ' ')}</p>
                 <p>선택한 차량: {selectedCar}</p>
                 <p>호출할 지역: 위도 {selectedLatitude}, 경도 {selectedLongitude}</p>
-                <p>예상 가격: {selectedCarFee}</p>
+                <p>예상 가격: {selectedCarFee}원</p>
             </div>
             
             <button onClick={handleReservationConfirmation} className={styles.confirmButton}>

@@ -9,8 +9,8 @@ function Busan() {
   const dummyData = [
     { id: 1, title: "해운대", image: BusanImage },
     { id: 2, title: "부산 타워", image: BusanImage3 },
-    { id: 3, title: "광안리", image: BusanImage },
-    { id: 4, title: "태종대", image: BusanImage },
+    { id: 3, title: "광안리", image: BusanImage2 },
+    { id: 4, title: "태종대", image: BusanImage4 },
     { id: 5, title: "감천 문화 마을", image: BusanImage },
     { id: 6, title: "부산 국제 영화제", image: BusanImage },
     { id: 7, title: "부산 아쿠아리움", image: BusanImage },

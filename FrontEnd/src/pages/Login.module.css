@@ -4,6 +4,7 @@
   align-items: center;
   height: 100vh;
   background-color: #e0b0ff; /* 자주빛에서 보라빛으로 변경 */
+
 }
 
 .loginForm {
@@ -13,6 +14,7 @@
   box-shadow: 0 0 10px rgba(128, 0, 128, 0.1); /* 보라색 계열의 그림자 */
   max-width: 300px;
   width: 100%;
+
 }
 
 .loginForm h2 {

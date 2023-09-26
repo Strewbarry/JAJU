@@ -9,19 +9,23 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-const PORT = 3000
+const PORT = 3001
 
 app.use(cors())
 app.set('port', PORT)
 
 const mysql = require('mysql');
 const connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'driver',
-  password : 'test',
-  database : 'auto_drive'
+  host     : 'j9c104.p.ssafy.io',
+  user     : 'root',
+  password : '1',
+  database : 'auto_drive',
+  port : 9876
 });
-// connection.connect();
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+  });
 
 // 회원 조회
 app.get('/read', (req,res) => {

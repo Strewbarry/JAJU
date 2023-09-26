@@ -2,14 +2,23 @@
 # -*- coding: utf-8 -*-
 
 import rospy
+import os
+import sys
 import rospkg
 from math import cos,sin,pi,sqrt,pow,atan2
-from geometry_msgs.msg import Point,PoseWithCovarianceStamped
+from geometry_msgs.msg import Point,Point32,PoseWithCovarianceStamped
 from nav_msgs.msg import Odometry,Path
-from morai_msgs.msg import CtrlCmd,EgoVehicleStatus,ObjectStatusList
+from morai_msgs.msg import CtrlCmd,EgoVehicleStatus,ObjectStatusList,GetTrafficLightStatus
 import numpy as np
 import tf
 from tf.transformations import euler_from_quaternion,quaternion_from_euler
+from std_msgs.msg import Bool
+
+current_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(current_path)
+
+from lib.mgeo.class_defs import *
+
 
 # acc 는 차량의 Adaptive Cruise Control 예제입니다.
 # 차량 경로상의 장애물을 탐색하여 탐색된 차량과의 속도 차이를 계산하여 Cruise Control 을 진행합니다.
@@ -49,12 +58,26 @@ class pure_pursuit :
         # Ego topic 데이터는 차량의 현재 속도를 알기 위해 사용한다.
         # Gloabl Path 데이터는 경로의 곡률을 이용한 속도 계획을 위해 사용한다.
         rospy.Subscriber("/global_path", Path, self.global_path_callback)
-        rospy.Subscriber("local_path", Path, self.path_callback)
-        rospy.Subscriber("odom", Odometry, self.odom_callback)
+        rospy.Subscriber("/local_path", Path, self.path_callback)
+        rospy.Subscriber("/odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
         rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
+        rospy.Subscriber('/GetTrafficLightStatus', GetTrafficLightStatus, self.traffic_light_callback)
+        rospy.Subscriber('/object_detected', Bool, self.object_detected_callback)
+        # self.object_detected_sub = rospy.Subscriber('/object_detected', Bool, self.detected_callback)
+
         self.ctrl_cmd_pub = rospy.Publisher('ctrl_cmd',CtrlCmd, queue_size=100)
 
+        load_path = os.path.normpath(os.path.join(current_path, 'lib/mgeo_data/R_KR_PG_K-City'))
+        mgeo_planner_map = MGeo.create_instance_from_json(load_path)
+
+
+        self.is_traffic = False
+        self.object_detected = Bool()
+        self.object_detected = False
+        light_set = mgeo_planner_map.light_set
+        self.lights = light_set.signals
+        self.kids = kidsArea()
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -67,17 +90,19 @@ class pure_pursuit :
         self.is_look_forward_point = False
 
         self.forward_point = Point()
-        self.current_postion = Point()
+        self.current_position = None
 
         self.vehicle_length = 2.7
         self.lfd = 8
         self.min_lfd = 5
         self.max_lfd = 30
-        self.lfd_gain = 0.78
-        self.target_velocity = 60
+        self.lfd_gain = 0.75
+        self.target_velocity = 55
+        self.dis = 999
 
         self.pid = pidControl()
-        self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain = 0.5, distance_gain = 1, time_gap = 0.8, vehicle_length = 2.7)
+        self.adaptive_cruise_control = AdaptiveCruiseControl(velocity_gain = 0.1, distance_gain = 1, time_gap = 0.8, vehicle_length = 4)
+
         self.vel_planning = velocityPlanning(self.target_velocity/3.6, 0.15)
 
         while True:
@@ -90,10 +115,18 @@ class pure_pursuit :
         rate = rospy.Rate(10) # 10hz
         while not rospy.is_shutdown():
 
+            if self.object_detected:
+                print("Object Detected:", self.object_detected)
+
+            if self.is_traffic:
+                self.light_msg = self.findTrafficLight()
+
+                self.dis = sqrt(pow(self.status_msg.position.x - self.light_msg.x, 2) + pow(self.status_msg.position.y - self.light_msg.y, 2))
+
             if self.is_path == True and self.is_odom == True and self.is_status == True:
 
                 # global_obj,local_obj
-                result = self.calc_vaild_obj([self.current_postion.x, self.current_postion.y, self.vehicle_yaw], self.object_data)
+                result = self.calc_vaild_obj(self.status_msg, self.object_data)
                 
                 global_npc_info = result[0] 
                 local_npc_info = result[1] 
@@ -102,17 +135,41 @@ class pure_pursuit :
                 global_obs_info = result[4] 
                 local_obs_info = result[5] 
                 
-                self.current_waypoint = self.get_current_waypoint([self.current_postion.x, self.current_postion.y], self.global_path)
+                self.current_waypoint = self.get_current_waypoint(self.status_msg, self.global_path)
                 self.target_velocity = self.velocity_list[self.current_waypoint] * 3.6
 
                 steering = self.calc_pure_pursuit()
                 if self.is_look_forward_point :
                     self.ctrl_cmd_msg.steering = steering
 
+                    
+                    if not self.kids.check_kidsArea(self.current_position.x,self.current_position.y):
+                        self.target_velocity = 20
+                        if self.dis < 10:
+                            if self.trafficLightStatus == 1 or self.trafficLightStatus == 4:
+                                self.target_velocity = 0
+
+                    else:
+                        if self.dis < 34:
+                            self.target_velocity = 30
+                        if self.dis < 24: 
+                            if self.trafficLightStatus == 1 or self.trafficLightStatus == 4:
+                                self.target_velocity = 0
+                            else:
+                                if self.dis < 15:
+                                    self.target_velocity = 50
+
                     self.adaptive_cruise_control.check_object(self.path, global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info)
+                    
                     self.target_velocity = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info, self.status_msg.velocity.x, self.target_velocity / 3.6)
 
+                    if self.target_velocity > 55:
+                        self.target_velocity = 55
+
                     output = self.pid.pid(self.target_velocity, self.status_msg.velocity.x * 3.6)
+                        
+                    if self.target_velocity < 5:
+                        output = -1
 
                     if output > 0.0:
                         self.ctrl_cmd_msg.accel = output
@@ -134,16 +191,19 @@ class pure_pursuit :
 
             rate.sleep()
 
+
+
     def path_callback(self,msg):
         self.is_path = True
         self.path = msg  
 
     def odom_callback(self,msg):
         self.is_odom = True
+        self.current_position = Point()
         odom_quaternion = (msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w)
         _,_,self.vehicle_yaw = euler_from_quaternion(odom_quaternion)
-        self.current_postion.x = msg.pose.pose.position.x
-        self.current_postion.y = msg.pose.pose.position.y
+        self.current_position.x = msg.pose.pose.position.x
+        self.current_position.y = msg.pose.pose.position.y
 
     def status_callback(self,msg): ## Vehicl Status Subscriber 
         self.is_status = True
@@ -155,18 +215,34 @@ class pure_pursuit :
 
     def object_info_callback(self,data): ## Object information Subscriber
         self.is_object_info = True
-        self.object_data = data 
+        self.object_data = data
 
+    def traffic_light_callback(self,msg):
+        self.is_traffic = True
+        self.trafficLightIdx = msg.trafficLightIndex
+        self.trafficLightStatus = msg.trafficLightStatus
+
+    def findTrafficLight(self):
+        near_light = Point32()
+        for light_idx in self.lights:
+            tmp_Idx = self.lights[light_idx].idx
+            if tmp_Idx == self.trafficLightIdx:
+                near_light.x = self.lights[light_idx].point[0]
+                near_light.y = self.lights[light_idx].point[1]
+
+                return near_light
+            
+    def object_detected_callback(self, msg):
+        # 콜백 함수에서 객체 감지 여부를 갱신합니다.
+        self.object_detected = msg.data
+        
     def get_current_waypoint(self,ego_status,global_path):
         min_dist = float('inf')
         currnet_waypoint = -1
 
-        ego_pose_x = ego_status[0]
-        ego_pose_y = ego_status[1]
-
         for i,pose in enumerate(global_path.poses):
-            dx = ego_pose_x - pose.pose.position.x
-            dy = ego_pose_y - pose.pose.position.y
+            dx = ego_status.position.x - pose.pose.position.x
+            dy = ego_status.position.y - pose.pose.position.y
 
             dist = sqrt(pow(dx, 2) + pow(dy, 2))
             if min_dist > dist :
@@ -174,12 +250,12 @@ class pure_pursuit :
                 currnet_waypoint = i
         return currnet_waypoint
 
-    def calc_vaild_obj(self,status_msg,object_data):
+    def calc_vaild_obj(self,ego_status,object_data):
         
         self.all_object = object_data        
-        ego_pose_x = status_msg[0]
-        ego_pose_y = status_msg[1]
-        ego_heading = status_msg[2]
+        ego_pose_x = ego_status.position.x
+        ego_pose_y = ego_status.position.y
+        ego_heading = self.vehicle_yaw
         
         global_npc_info = []
         local_npc_info  = []
@@ -227,6 +303,8 @@ class pure_pursuit :
                     local_obs_info.append([obs_list.type, local_result[0][0], local_result[1][0], obs_list.velocity.x])
                 
         return global_npc_info, local_npc_info, global_ped_info, local_ped_info, global_obs_info, local_obs_info
+    
+
 
     def calc_pure_pursuit(self,):
 
@@ -248,7 +326,7 @@ class pure_pursuit :
         rospy.loginfo(self.lfd)
 
         
-        vehicle_position=self.current_postion
+        vehicle_position=self.current_position
         self.is_look_forward_point= False
 
         translation = [vehicle_position.x, vehicle_position.y]
@@ -306,6 +384,10 @@ class pidControl:
         self.controlTime = 0.02
 
     def pid(self,target_vel, current_vel):
+        if(target_vel < 5):
+            output = -1.0
+            return output
+        
         error = target_vel - current_vel
 
         #TODO: (5) PID 제어 생성
@@ -313,7 +395,7 @@ class pidControl:
         # 종방향 제어를 위한 PID 제어기는 현재 속도와 목표 속도 간 차이를 측정하여 Accel/Brake 값을 결정 합니다.
         # 각 PID 제어를 위한 Gain 값은 "class pidContorl" 에 정의 되어 있습니다.
         # 각 PID Gain 값을 직접 튜닝하고 아래 수식을 채워 넣어 P I D 제어기를 완성하세요.
-
+        """
         p_control = self.p_gain * error
         if error <= 5:
             self.i_control += self.i_gain * error * self.controlTime
@@ -321,7 +403,17 @@ class pidControl:
 
         output = p_control + self.i_control + d_control
         self.prev_error = error
+        """
+        # 목표 속도에 도달한 경우 브레이크 비활성화
+        if abs(error) <= 3:  # 예: 목표 속도와의 오차가 5 km/h 이하인 경우
+            output = 0
+        else:
+            p_control = self.p_gain * error
+            self.i_control += self.i_gain * error * self.controlTime
+            d_control = self.d_gain * (error - self.prev_error) / self.controlTime
+            output = p_control + self.i_control + d_control
 
+        self.prev_error = error
 
         return output
 
@@ -384,6 +476,7 @@ class velocityPlanning:
 
 class AdaptiveCruiseControl:
     def __init__(self, velocity_gain, distance_gain, time_gap, vehicle_length):
+
         self.npc_vehicle = [False, 0]
         self.object = [False, 0]
         self.Person = [False, 0]
@@ -391,6 +484,9 @@ class AdaptiveCruiseControl:
         self.distance_gain = distance_gain
         self.time_gap = time_gap
         self.vehicle_length = vehicle_length
+
+        
+        
 
         self.object_type = None
         self.object_distance = 0
@@ -411,15 +507,18 @@ class AdaptiveCruiseControl:
 
         '''
 
+            
+
 
         # 주행 경로 상 보행자 유무 파악
         min_rel_distance = float('inf')
+        # if self.object_detected == True: plus code
         if len(global_ped_info) > 0 :        
             for i in range(len(global_ped_info)):
                 for path in ref_path.poses :      
                     if global_ped_info[i][0] == 0 : # type=0 [pedestrian]
                         dis = sqrt(pow(path.pose.position.x - global_ped_info[i][1], 2) + pow(path.pose.position.y - global_ped_info[i][2], 2))
-                        if dis < 1:                            
+                        if dis < 2:                            
                             rel_distance = sqrt(pow(local_ped_info[i][1], 2) + pow(local_ped_info[i][2], 2))
                             if rel_distance < min_rel_distance:
                                 min_rel_distance = rel_distance
@@ -434,7 +533,7 @@ class AdaptiveCruiseControl:
                 for path in ref_path.poses :      
                     if global_npc_info[i][0] == 1 : # type=1 [npc_vehicle] 
                         dis = sqrt(pow(path.pose.position.x - global_npc_info[i][1], 2) + pow(path.pose.position.y - global_npc_info[i][2], 2))
-                        if dis < 1:
+                        if dis < 2:
                             rel_distance = sqrt(pow(local_npc_info[i][1], 2) + pow(local_npc_info[i][2], 2))       
                             if rel_distance < min_rel_distance:
                                 min_rel_distance = rel_distance
@@ -453,7 +552,7 @@ class AdaptiveCruiseControl:
                 for path in ref_path.poses :      
                     if global_obs_info[i][0] == 2 : # type=1 [obstacle] 
                         dis = sqrt(pow(path.pose.position.x - global_obs_info[i][1], 2) + pow(path.pose.position.y - global_obs_info[i][2], 2))
-                        if dis < 1:
+                        if dis < 2:
                             rel_distance = sqrt(pow(local_obs_info[i][1], 2) + pow(local_obs_info[i][2], 2))
                             if rel_distance < min_rel_distance:
                                 min_rel_distance = rel_distance
@@ -464,46 +563,87 @@ class AdaptiveCruiseControl:
     def get_target_velocity(self, local_npc_info, local_ped_info, local_obs_info, ego_vel, target_vel): 
         #TODO: (9) 장애물과의 속도와 거리 차이를 이용하여 ACC 를 진행 목표 속도를 설정
         out_vel =  target_vel
-        default_space = 10
-        time_gap = self.time_gap
-        v_gain = self.velocity_gain
-        x_errgain = self.distance_gain
+        default_space = 7
+        self.time_gap = self.time_gap
+        self.v_gain = self.velocity_gain
+        self.x_errgain = self.distance_gain
 
-        if self.npc_vehicle[0] and len(local_npc_info) != 0: #ACC ON_vehicle   
-            print("ACC ON NPC_Vehicle")         
+        if self.npc_vehicle[0] and len(local_npc_info) != 0: #ACC ON_vehicle
+            print("ACC ON NPC_Vehicle")
+            """
             front_vehicle = [local_npc_info[self.npc_vehicle[1]][1], local_npc_info[self.npc_vehicle[1]][2], local_npc_info[self.npc_vehicle[1]][3]]
             
             dis_safe = ego_vel * time_gap + default_space
-            dis_rel = sqrt(pow(front_vehicle[0],2) + pow(front_vehicle[1],2))            
-            vel_rel=((front_vehicle[2] / 3.6) - ego_vel)                        
+
+            dis_rel = sqrt(pow(front_vehicle[0],2) + pow(front_vehicle[1],2))
+            
+            vel_rel=((front_vehicle[2] / 3.6) - ego_vel)
             acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)
 
-            out_vel = ego_vel + acceleration      
+            out_vel = ego_vel + acceleration
+            """
+            front_vehicle = [local_npc_info[self.npc_vehicle[1]][1], local_npc_info[self.npc_vehicle[1]][2], local_npc_info[self.npc_vehicle[1]][3]]
+
+            self.object_distance = sqrt(pow(front_vehicle[0],2) + pow(front_vehicle[1],2))
+            if front_vehicle[2] < 5:
+                if self.object_distance < 20:
+                    out_vel = 0
+                    return out_vel
+                
+            velocity_error = ego_vel - front_vehicle[2]
+            safe_distance = ego_vel*self.time_gap + default_space
+            distance_error = safe_distance - self.object_distance
+
+            acceleration = -(self.velocity_gain*velocity_error + self.distance_gain*distance_error)
+            out_vel = min(ego_vel+acceleration, target_vel)
+
+            if self.object_distance < default_space:
+                out_vel = 0
+                return out_vel
 
         if self.Person[0] and len(local_ped_info) != 0: #ACC ON_Pedestrian
             print("ACC ON Pedestrian")
+            """
             Pedestrian = [local_ped_info[self.Person[1]][1], local_ped_info[self.Person[1]][2], local_ped_info[self.Person[1]][3]]
             
             dis_safe = ego_vel* time_gap + default_space
-            dis_rel = sqrt(pow(Pedestrian[0],2) + pow(Pedestrian[1],2))            
-            vel_rel = (Pedestrian[2] - ego_vel)              
-            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
+            dis_rel = sqrt(pow(Pedestrian[0],2) + pow(Pedestrian[1],2))
+            vel_rel = (Pedestrian[2] - ego_vel)
+            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)
 
             out_vel = ego_vel + acceleration
+            """
+            Pedestrian = [local_ped_info[self.Person[1]][1], local_ped_info[self.Person[1]][2], local_ped_info[self.Person[1]][3]]
+
+            self.object_distance = sqrt(pow(Pedestrian[0],2) + pow(Pedestrian[1],2))
+            default_space = 30
+
+            if self.object_distance < default_space:
+                out_vel = 0
    
         if self.object[0] and len(local_obs_info) != 0: #ACC ON_obstacle     
             print("ACC ON Obstacle")                    
             Obstacle = [local_obs_info[self.object[1]][1], local_obs_info[self.object[1]][2], local_obs_info[self.object[1]][3]]
             
-            dis_safe = ego_vel* time_gap + default_space
-            dis_rel = sqrt(pow(Obstacle[0],2) + pow(Obstacle[1],2))            
-            vel_rel = (Obstacle[2] - ego_vel)
-            acceleration = vel_rel * v_gain - x_errgain * (dis_safe - dis_rel)    
+            self.object_distance = sqrt(pow(Obstacle[0],2) + pow(Obstacle[1],2))
+            default_space = 30
 
-            out_vel = ego_vel + acceleration           
+            if self.object_distance < default_space:
+                out_vel = 0
 
         return out_vel * 3.6
 
+class kidsArea:
+    def __init__(self):
+        self.kidslist = 0
+
+    # x 75 130
+    # y 1140 1205
+    def check_kidsArea(self,nowEgo_x, nowEgo_y):
+        if(75<=nowEgo_x<=130 and 1140<nowEgo_y<1205):
+            return False
+        else:
+            return True
 
 if __name__ == '__main__':
     try:

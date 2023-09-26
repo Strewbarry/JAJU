@@ -138,7 +138,7 @@ exports.rightnow = async (req, res) => {
             resolve(results);
         });
     });
-    
+    console.log(selected_car)
     res.status(200).json(selected_car)
 }
 

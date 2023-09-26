@@ -62,6 +62,7 @@ function ROS() {
     <div>
       {status}
     </div>
+    <button onClick={() => connect()}>Connect</button> {/* Connect 버튼 추가 */}
     <p>Send a message to turtle</p>
     <p>Linear:</p>
     <label>X</label>
@@ -79,6 +80,13 @@ function ROS() {
     <input name={"angular"} type={"number"} value={angular.z} onChange={(ev) => setAngular({...angular, z: convert(ev.target.value)})}/>
     <br />
     <button onClick={() => publish()}>Publish</button>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
         <br/>
   </div>
   )

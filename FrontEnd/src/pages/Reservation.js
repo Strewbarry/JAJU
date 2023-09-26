@@ -14,7 +14,7 @@ const Reservation = () => {
   const [availableCars, setAvailableCars] = useState(null); 
   const [showModal, setShowModal] = useState(false);
 
-  const regions = ['서울', '부산', '제주','강릉','대전','광주','구미','K-city'];
+  const regions = ['서울', '부산', '제주','강릉','대전','광주','구미'];
   const times = Array.from({length: 24}, (_, i) => i < 10 ? `0${i}` : `${i}`);
   const minutesOptions = ['00', '30'];
 

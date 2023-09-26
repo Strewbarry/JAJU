@@ -17,7 +17,7 @@ import SeeReservation from './pages/SeeReservation';
 import Header from './Header';
 import Menu from './pages/Menu';
 import Footer from './Footer';
-
+import ROS from './ROS';
 
 import Recommended from './Recommend/RecommendedSpot';  // RecommendedSpot 임포트
 import Yangyang from './Recommend/Yangyang';
@@ -86,6 +86,8 @@ function App() {
         <Route path="/yangyang" element={<Yangyang />} />
         <Route path="/seoul" element={<Seoul />} />
         <Route path="/busan" element={<Busan />} />
+        <Route path="/ros" element={<ROS />} />
+
 
       </Routes>
       <Footer/>

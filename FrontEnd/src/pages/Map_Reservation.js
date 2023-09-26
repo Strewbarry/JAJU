@@ -60,17 +60,17 @@ const markers = [
 
   // 제주도
   { position: [33.506691, 126.494019], icon: defaultIcon, label: '제주공항' },
-  { position: [33.512792, 126.510484], icon: defaultIcon, label: '미르 게스트하우스' },
+  { position: [33.512792, 126.510484], icon: hotelIcon, label: '미르 게스트하우스' },
   { position: [33.512738, 126.526128], icon: defaultIcon, label: '제주 동문 시장' },
-  { position: [33.500715, 126.505564], icon: defaultIcon, label: '제주 스타벅스' },
+  { position: [33.500715, 126.505564], icon: coffeeIcon, label: '제주 스타벅스' },
   { position: [33.495223, 126.492732], icon: defaultIcon, label: '맥도날드' },
 
 
   // 부산
-  { position: [35.114751, 129.043291], icon: defaultIcon, label: '부산역' },
+  { position: [35.114751, 129.043291], icon: stationIcon, label: '부산역' },
   { position: [35.117730, 129.041295], icon: defaultIcon, label: '대건명가돼지국밥' },
-  { position: [35.116212, 129.041592], icon: defaultIcon, label: '아스티호텔 4성급' },
-  { position: [35.116263, 129.040803], icon: defaultIcon, label: '부산 스타벅스' },
+  { position: [35.116212, 129.041592], icon: hotelIcon, label: '아스티호텔 4성급' },
+  { position: [35.116263, 129.040803], icon: coffeeIcon, label: '부산 스타벅스' },
   { position: [35.120741, 129.039271], icon: defaultIcon, label: '개미집 부산역점' },
 
 

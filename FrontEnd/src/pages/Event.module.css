@@ -1,29 +1,33 @@
-/* 자주빛 테마 적용 */
 .eventContainer {
-    background-color: #f7e6f3; /* 밝은 자주빛 배경색 */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 60px;
-  }
-  
-  .eventTitle {
-    color: #9b59b6; /* 강렬한 자주빛 */
-    font-family: 'Arial', sans-serif; /* 원하는 폰트로 변경 가능 */
-    margin-bottom: 10px;
-  }
-  
-  .eventPeriod {
-    color: #8e44ad;
-    margin-bottom: 5px;
-  }
-  
-  .eventDescription {
-    color: #9b59b6;
-  }
-  
-  .eventSeparator {
-    border: 0.5px solid #d3b1e0; /* 자주빛 선 */
-    margin: 20px 0;
-  }
-  
+  background-color: #f7e6f3;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 60px;
+  max-width: 600px; /* 컨테이너의 최대 너비 제한 (선택사항) */
+  margin: 0 auto; /* 페이지 중앙 정렬 */
+}
+
+.eventTitle {
+  color: #9b59b6;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 8px;
+  font-size: 1.5em; /* 폰트 크기 강조 */
+  font-weight: 600; /* 조금 더 두껍게 */
+}
+
+.eventPeriod {
+  color: #8e44ad;
+  margin-bottom: 7px;
+  font-weight: 500; /* 중간 두께 */
+}
+
+.eventDescription {
+  color: #9b59b6;
+  font-size: 0.9em; /* 약간 줄인 글자 크기 */
+}
+
+.eventSeparator {
+  border: 0.5px solid #d3b1e0;
+  margin: 25px 0; /* 간격 조정 */
+}

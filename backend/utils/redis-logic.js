@@ -8,14 +8,14 @@ const redis = new Redis({
 });
 
 // Redis에 값을 저장
-async function setValue (a,b,select) {
+async function setValue (a, select) {
   try {
     if ( select === 1) {
 
-        const x = a.toString()
-        const y = b.toString()
+        // const x = a.toString()
+        // const y = b.toString()
         await redis.set('status', 'start')
-        await redis.lpush('cmd', x, y);
+        await redis.set('cmd', a);
         console.log('값이 설정되었습니다.');
     }
     else {
@@ -29,4 +29,6 @@ async function setValue (a,b,select) {
 }
 const a = 'asdf'
 const b = 'as'
-setValue(a, b, 1);
+setValue(a, 1);
+
+module.exports = {setValue}

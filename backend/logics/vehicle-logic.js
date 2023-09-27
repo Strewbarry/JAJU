@@ -1,4 +1,31 @@
 
+const Redis = require('ioredis');
+
+// Redis 서버에 연결
+const redis = new Redis({
+  host: 'j9c104.p.ssafy.io',
+  port: 6379, // Redis 기본 포트
+  password: 'c104' // 설정된 경우에만 필요
+});
+async function setValue (a, select) {
+    try {
+      if ( select === 1) {
+  
+          // const x = a.toString()
+          // const y = b.toString()
+          await redis.set('status', 'start')
+          await redis.set('cmd', a);
+          console.log('값이 설정되었습니다.');
+      }
+      else {
+          await redis.set('status', 'stop')
+      }
+    } catch (error) {
+      console.error('오류 발생:', error);
+    } finally {
+      redis.quit(); // 연결 종료
+    }
+  }
 
 const connection = require("../utils/database.js")
 
@@ -124,12 +151,7 @@ exports.rightnow = async (req, res) => {
             selected_car = car
             break
         }
-        // if (reservate_able === true) {
-        //     // console.log(between_time*car_info[vehi_id.car_info_id].fee_per_hour)
-        //     vehi_id.total_fee = between_time*car_info[vehi_id.car_info_id-1].fee_per_hour
-        //     // console.log(vehi_id)
-        //     vehicle_list.push(vehi_id)
-        // }
+       
     }
     const car_info = await new Promise((resolve, reject) => {
         
@@ -145,20 +167,31 @@ exports.rightnow = async (req, res) => {
 
 exports.move = async (req, res) => {
     const vehicle_id = req.body.vehicle_id
-    const destination = req.body.destination
+    const destination_name = req.body.destination_name
 
-    
+    const destination = await new Promise((resolve, reject) => {
+        
+        connection.query('SELECT * FROM desti WHERE (`name`=?);', destination_name, function (error, results, fields) {
+            if (error) reject(error);
+            resolve(results);
+        });
+    });
+    console.log(destination)
+    console.log(destination_name)
     const sql = 'UPDATE `vehicle` SET `destination` = ? WHERE (`id` = ?);'
-    const params = [destination, vehicle_id]
+    const params = [destination[0].node_number , vehicle_id]
 
     
     connection.query(sql, params, function (error, results, fields) {
         if (error) reject(error);
         
-        res.status(200).json(results)
+        console.log('목적지 등록 성공')
     });
-        
     
+    console.log(setValue)
+    setValue(destination[0].id, 1)
+    
+    res.status(200).json(destination)
 }
 
 exports.stop = async (req, res) => {
@@ -170,6 +203,9 @@ exports.stop = async (req, res) => {
     connection.query(sql, params, function (error, results, fields) {
         if (error) reject(error);
         
-        res.status(200).json(results)
+        console.log('목적지 삭제 성공')
     });
+
+    setValue(0,0)
+    res.status(200).json('목적지 삭제 성공')
 }

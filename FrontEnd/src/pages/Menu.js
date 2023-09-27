@@ -70,6 +70,10 @@ function Menu() {
     navigate('/changeinfo');
   };
 
+  const goToRentedCarInfo = () => {
+    navigate('/rentedcarinfo');
+  };
+
   const goToSeeReservation = () => {
     navigate('/seereservation');
   };
@@ -86,6 +90,7 @@ function Menu() {
       {token && <button className={styles.button} onClick={handleLogout}>로그아웃</button>}
       {token && <button className={styles.button} onClick={goToChangeinfo}>회원정보변경</button>}
       {token && <button className={styles.button} onClick={goToSeeReservation}>예약내역확인하기</button>}
+      {token && <button className={styles.button} onClick={goToRentedCarInfo}>빌린차량정보</button>}
       {token && <button className={`${styles.button} ${styles.deleteButton}`} onClick={openModal}>회원 탈퇴</button>}
 
       {isModalOpen && (

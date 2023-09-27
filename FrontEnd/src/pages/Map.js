@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Sheet } from 'react-modal-sheet';
 import axios from 'axios';
 import styles from './Map.module.css';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON } from 'react-leaflet';
@@ -6,9 +7,9 @@ import osm from "../osm-providers";
 import osm2 from "../osm-providers2";
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import ROSLIB from 'roslib';
+// import ROSLIB from 'roslib';
 import pathData from '../Path.json';
-
+import RentedCarInfo from './RentedCarInfo';
 import placeholderImage from '../assets/placeholder.png';
 import HotelImage from '../assets/Hotel.png';
 import coffeeImage from '../assets/coffee.png';
@@ -38,6 +39,8 @@ const markers = [
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
   { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '술집' },
+  { position: [37.239984102516516, 126.77420129836432], icon: defaultIcon, label: '학교' },
+
 ];
 
 function Map() {
@@ -46,6 +49,7 @@ function Map() {
   const [mapType, setMapType] = useState('normal');
   const [showModal, setShowModal] = useState(false);
   const [carInfo, setCarInfo] = useState({ name: '', number: '' , fuel_left: ''});
+  const [isOpen, setIsOpen] = useState(false); // 모달창 열고 닫기
 
 
   const callVehicle = async (lat, lng) => {
@@ -106,22 +110,22 @@ const closeModal = () => {
     ));
   };
 
-  const MAPREAD = () => {
-    this.ros = new ROSLIB.Ros({ url: 'ws://localhost:9090' });
-    this.ros.on('connection', (connection) => console.log('connection'));
-    this.ros.on('error', (connection) => console.log('에러'));
-    this.ros.on('close', (connection) => console.log('닫기'));
+  // const MAPREAD = () => {
+  //   this.ros = new ROSLIB.Ros({ url: 'ws://localhost:9090' });
+  //   this.ros.on('connection', (connection) => console.log('connection'));
+  //   this.ros.on('error', (connection) => console.log('에러'));
+  //   this.ros.on('close', (connection) => console.log('닫기'));
 
-    let global_path_listener = new ROSLIB.Topic({
-      ros: this.ros,
-      name: '/global_path',
-      messageType: 'nav_msgs/Path'
-    });
+  //   let global_path_listener = new ROSLIB.Topic({
+  //     ros: this.ros,
+  //     name: '/global_path',
+  //     messageType: 'nav_msgs/Path'
+  //   });
 
-    global_path_listener.subscribe(data => {
-      console.log(data.poses[0].pose.position.x)
-    });
-  };
+  //   global_path_listener.subscribe(data => {
+  //     console.log(data.poses[0].pose.position.x)
+  //   });
+  // };
 
   const MapEvents = () => {
     useMapEvents({
@@ -199,18 +203,23 @@ const closeModal = () => {
                 </div>
             </div>
         </div>
+
         {showModal && (
-                <div className={styles.modal}>
-                    <div className={styles.modalContent}>
-                        <h3>이 차량을 빌리시겠습니까?</h3>
-                        <p>차량 종류: {carInfo.name}</p>
-                        <p>주행가능 거리: {carInfo.fuel_left}km</p>
-                        <p>차량 번호: {carInfo.number}</p>
-                        <button onClick={reserveVehicle}>예</button>
-                        <button onClick={closeModal}>아니오</button>
-                    </div>
+            <div className={styles.modal}>
+                <div className={styles.modalContent}>
+                    <h3>이 차량을 빌리시겠습니까?</h3>
+                    <p>차량 종류: {carInfo.name}</p>
+                    <p>주행가능 거리: {carInfo.fuel_left}km</p>
+                    <p>차량 번호: {carInfo.number}</p>
+                    <button onClick={reserveVehicle}>예</button>
+                    <button onClick={closeModal}>아니오</button>
                 </div>
-            )}
+            </div>
+        )}
+
+
+        {/* 바텀 시트를 연다는 버튼 예시 */}
+        <button onClick={() => setIsOpen(true)}>차량 정보 보기</button>
     </div>
   );
 }

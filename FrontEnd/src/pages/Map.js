@@ -9,7 +9,6 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 // import ROSLIB from 'roslib';
 import pathData from '../Path.json';
-import RentedCarInfo from './RentedCarInfo';
 import placeholderImage from '../assets/placeholder.png';
 import HotelImage from '../assets/Hotel.png';
 import coffeeImage from '../assets/coffee.png';
@@ -48,14 +47,21 @@ const markers = [
 function Map() {
   const [isRented, setIsRented] = useState(false);
   const [clickedPosition, setClickedPosition] = useState(null);
+  const [clickedLatitude, setClickedLatitude] = useState(null);
+  const [clickedLongitude, setClickedLongitude] = useState(null);
   const [mapType, setMapType] = useState('normal');
   const [showModal, setShowModal] = useState(false);
   const [carInfo, setCarInfo] = useState({ name: '', number: '' , fuel_left: ''});
-  const [isOpen, setIsOpen] = useState(false); // 모달창 열고 닫기
+ 
+    // 예약 정보를 저장하기 위한 상태 추가
 
+  const [vehicleId, setVehicleId] = useState(null); // to store vehicle id
 
   const callVehicle = async (lat, lng) => {
     try {
+      setClickedLatitude(lat); // set latitude here
+      setClickedLongitude(lng); // set longitude here
+
         const token = localStorage.getItem('token');
         const around_location = '제주';
         const postData = { around_location, lat, lng };
@@ -82,6 +88,9 @@ function Map() {
             fuel_left: response.data.fuel_left,
         });
 
+            // 예약 ID를 상태에 저장합니다.
+        
+        setVehicleId(response.data.id); // save vehicle_id to state
         setShowModal(true);
 
     } catch (error) {
@@ -94,9 +103,23 @@ const closeModal = () => {
 };
 
 
-  const returnVehicle = () => {
-    setIsRented(false);
-  };
+const returnVehicle = async () => {
+  try {
+      // Here you could perform any logic necessary for returning the vehicle,
+      // such as making an API call to update the reservation status on your server.
+
+      // After successfully returning the vehicle, set isRented to false.
+      setIsRented(false);
+
+      setVehicleId(null);
+      // Further code for returning vehicle goes here if necessary.
+
+      console.log('Vehicle returned successfully');
+  } catch (error) {
+      console.error('Error while returning the vehicle:', error);
+  }
+};
+
 
   const RenderMarkers = () => {
     return markers.map((marker, index) => (
@@ -107,6 +130,11 @@ const closeModal = () => {
             <button onClick={returnVehicle}>목적지로 선택</button> : 
             <button onClick={() => callVehicle(marker.position[0], marker.position[1])}>이곳으로 호출하기</button>
           }
+          {isRented && (
+              <div className={styles.returnButtonContainer}>
+                  <button onClick={returnVehicle} className={styles.returnButton}>반납하기</button>
+              </div>
+          )}
         </Popup>
       </Marker>
     ));
@@ -133,6 +161,7 @@ const closeModal = () => {
     useMapEvents({
       click: (e) => {
         setClickedPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
+
         console.log(`위도: ${e.latlng.lat}, 경도: ${e.latlng.lng}`);
       },
     });
@@ -142,17 +171,19 @@ const closeModal = () => {
     try {
         const token = localStorage.getItem('token');
         const postData = {
-            reservation: true,
-            location: clickedPosition
+            // reservation: true,
+            lat: clickedLatitude, // use the saved latitude from state
+            lng: clickedLongitude, // use the saved longitude from state
+            vehicle_id: vehicleId
         };
 
         const response = await axios.post(
-            'http://192.168.100.38:3000/reservation/rightnow',
+            'http://192.168.100.38:3000/reservation/now',
             postData,
             { headers: { 'authorization': token } }
         );
 
-        if (response.data.success) {
+        if (response.status === 200) {
             console.log("Vehicle reserved successfully!");
             closeModal();
         } else {
@@ -162,6 +193,7 @@ const closeModal = () => {
         console.error('Error:', error);
     }
 };
+
 
 
   const lineStringData = {
@@ -175,6 +207,11 @@ const closeModal = () => {
 
   return (
     <div>
+        {isRented && (
+        <div className={styles.returnButtonContainer}>
+            <button onClick={returnVehicle} className={styles.returnButton}>반납하기</button>
+        </div>
+        )}
         <div className={styles.row}>
             <div className={`${styles.col} ${styles.textCenter}`}>
                 <div className={styles.col}>
@@ -219,9 +256,6 @@ const closeModal = () => {
             </div>
         )}
 
-
-        {/* 바텀 시트를 연다는 버튼 예시 */}
-        <button onClick={() => setIsOpen(true)}>차량 정보 보기</button>
     </div>
   );
 }

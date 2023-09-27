@@ -18,7 +18,7 @@ import Header from './Header';
 import Menu from './pages/Menu';
 import Footer from './Footer';
 import ROS from './ROS';
-
+import RentedCarInfo from './pages/RentedCarInfo';
 import Recommended from './Recommend/RecommendedSpot';  // RecommendedSpot 임포트
 import Yangyang from './Recommend/Yangyang';
 import Seoul from './Recommend/Seoul';
@@ -87,6 +87,7 @@ function App() {
         <Route path="/seoul" element={<Seoul />} />
         <Route path="/busan" element={<Busan />} />
         <Route path="/ros" element={<ROS />} />
+        <Route path="/rentedcarinfo" element={<RentedCarInfo />} />
 
 
       </Routes>

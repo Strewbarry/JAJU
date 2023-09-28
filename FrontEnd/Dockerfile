@@ -5,14 +5,7 @@ FROM node:18.16.1 as builder
 
 WORKDIR /app
 
-# package.json 및 package-lock.json 복사하여 종속성 캐시 활용
-COPY package*.json ./
-
-RUN npm install
-
 COPY . .
-
-RUN npm run build
 
 # Nginx 단계
 FROM nginx:latest

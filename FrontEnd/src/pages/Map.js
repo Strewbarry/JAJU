@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import {Url} from '../server_url';
 import axios from 'axios';
 import styles from './Map.module.css';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON } from 'react-leaflet';
@@ -15,7 +15,7 @@ import coffeeImage from '../assets/coffee.png';
 import restaurantImage from '../assets/restaurant.png';
 import swimImage from '../assets/swimmer.png';
 import beerImage from '../assets/beer.png';
-
+const url = Url
 const center = { lat: 37.23954358351303, lng: 126.771327801793 };
 const ZOOM_LEVEL = 15;
 
@@ -50,12 +50,21 @@ function Map() {
   const [clickedLatitude, setClickedLatitude] = useState(null);
   const [clickedLongitude, setClickedLongitude] = useState(null);
   const [mapType, setMapType] = useState('normal');
+  const [modalContent, setModalContent] = useState('reserve');
+
   const [showModal, setShowModal] = useState(false);
+
   const [carInfo, setCarInfo] = useState({ name: '', number: '' , fuel_left: ''});
  
     // 예약 정보를 저장하기 위한 상태 추가
 
   const [vehicleId, setVehicleId] = useState(null); // to store vehicle id
+
+  const returnVehiclePrompt = () => {
+    setModalContent('return');
+    setShowModal(true);
+};
+
 
   const callVehicle = async (lat, lng) => {
     try {
@@ -65,7 +74,7 @@ function Map() {
         const token = localStorage.getItem('token');
         const around_location = '제주';
         const postData = { around_location, lat, lng };
-        const response = await axios.post('http://192.168.100.38:3000/vehicle/rightnow', postData, { headers: { 'authorization': token } });
+        const response = await axios.post(`${url}/vehicle/rightnow`, postData, { headers: { 'authorization': token } });
         console.log("Response Data:", response.data);
         let carName = '';
         switch (response.data.car_info_id) {
@@ -105,14 +114,10 @@ const closeModal = () => {
 
 const returnVehicle = async () => {
   try {
-      // Here you could perform any logic necessary for returning the vehicle,
-      // such as making an API call to update the reservation status on your server.
 
-      // After successfully returning the vehicle, set isRented to false.
       setIsRented(false);
 
       setVehicleId(null);
-      // Further code for returning vehicle goes here if necessary.
 
       console.log('Vehicle returned successfully');
   } catch (error) {
@@ -130,11 +135,7 @@ const returnVehicle = async () => {
             <button onClick={returnVehicle}>목적지로 선택</button> : 
             <button onClick={() => callVehicle(marker.position[0], marker.position[1])}>이곳으로 호출하기</button>
           }
-          {isRented && (
-              <div className={styles.returnButtonContainer}>
-                  <button onClick={returnVehicle} className={styles.returnButton}>반납하기</button>
-              </div>
-          )}
+
         </Popup>
       </Marker>
     ));
@@ -178,17 +179,19 @@ const returnVehicle = async () => {
         };
 
         const response = await axios.post(
-            'http://192.168.100.38:3000/reservation/now',
+            `${url}/reservation/now`,
             postData,
             { headers: { 'authorization': token } }
         );
 
         if (response.status === 200) {
-            console.log("Vehicle reserved successfully!");
-            closeModal();
-        } else {
-            console.error("Failed to reserve the vehicle");
-        }
+          console.log("Vehicle reserved successfully!");
+          setIsRented(true); // 예약이 성공하면 isRented를 true로 설정
+          setModalContent('reserve'); // Modal content를 예약으로 설정
+          closeModal();
+      } else {
+          console.error("Failed to reserve the vehicle");
+      }
     } catch (error) {
         console.error('Error:', error);
     }
@@ -207,11 +210,7 @@ const returnVehicle = async () => {
 
   return (
     <div>
-        {isRented && (
-        <div className={styles.returnButtonContainer}>
-            <button onClick={returnVehicle} className={styles.returnButton}>반납하기</button>
-        </div>
-        )}
+
         <div className={styles.row}>
             <div className={`${styles.col} ${styles.textCenter}`}>
                 <div className={styles.col}>
@@ -224,37 +223,41 @@ const returnVehicle = async () => {
                         <MapEvents />
                         <RenderMarkers />
                         <GeoJSON data={lineStringData} />
-
                         {isRented && (
                             <div className={styles.returnButtonContainer}>
-                                <button onClick={returnVehicle} className={styles.returnButton}>반납하기</button>
+                                <button onClick={returnVehiclePrompt} className={styles.returnButton}>반납하기</button>
                             </div>
                         )}
+
                     </MapContainer>
 
-                    {clickedPosition && (
-                        <div className={styles.clickedPositionInfo}>
-                            클릭된 위치: <br />
-                            위도: {clickedPosition.lat} <br />
-                            경도: {clickedPosition.lng}
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
 
         {showModal && (
-            <div className={styles.modal}>
-                <div className={styles.modalContent}>
+    <div className={styles.modal}>
+        <div className={styles.modalContent}>
+            {modalContent === 'reserve' ? (
+                <>
                     <h3>이 차량을 빌리시겠습니까?</h3>
                     <p>차량 종류: {carInfo.name}</p>
                     <p>주행가능 거리: {carInfo.fuel_left}km</p>
                     <p>차량 번호: {carInfo.number}</p>
                     <button onClick={reserveVehicle}>예</button>
                     <button onClick={closeModal}>아니오</button>
-                </div>
-            </div>
-        )}
+                </>
+            ) : (
+                <>
+                    <h3>차량을 반납하시겠습니까?</h3>
+                    <button onClick={returnVehicle}>예</button>
+                    <button onClick={closeModal}>아니오</button>
+                </>
+            )}
+        </div>
+    </div>
+)}
+
 
     </div>
   );

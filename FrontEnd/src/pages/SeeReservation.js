@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from './SeeReservation.module.css';
+import {Url} from '../server_url';
 
 function SeeReservation() {
+    const url = Url
     const [reservations, setReservations] = useState([]);
     const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -26,7 +28,7 @@ function SeeReservation() {
         setLoading(true); // 로딩 시작
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://192.168.100.38:3000/reservation/delete/${selectedId}`, {
+            await axios.delete(`${url}/reservation/delete/${selectedId}`, {
                 headers: { 'authorization': token }
             });
 
@@ -55,11 +57,14 @@ function SeeReservation() {
             }
 
             try {
-                const response = await axios.get('http://192.168.100.38:3000/user/reservation', {
+                const response = await axios.get(`${url}/user/reservation`, {
                     headers: { 'authorization': token }
                 });
                 
                 setReservations(response.data);
+
+                            // 여기서 reservations 값을 출력합니다.
+                console.log(response.data);
             } catch (err) {
                 console.error(err);
                 setError('Error fetching reservation data');
@@ -88,6 +93,7 @@ function SeeReservation() {
                         {/* <p>차량 ID: {reservation.vehicle_id}</p> */}
                         <p>예상 가격:{reservation.price}원</p>
                         <p>차량 번호: {reservation.car_info[0].car_number}</p>
+                        <p>차량종류: {reservation.car_info_id}</p>
                         <p>하드코딩하면 장소어딘지 :</p>
                         <button onClick={() => handleCancelReservation(reservation.id)} className={styles.cancelButton}>예약 취소하기</button>
                     </div>

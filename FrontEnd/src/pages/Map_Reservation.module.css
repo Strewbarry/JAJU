@@ -28,3 +28,8 @@
     margin-top: 10px;
   }
   
+  .leaflet-circle-icon {
+    border-radius: 50%; /* 이미지를 원형으로 만들기 위한 속성 */
+    overflow: hidden; /* 이미지가 원형 경계를 넘어가는 부분을 잘라내기 위한 속성 */
+  }
+  

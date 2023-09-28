@@ -1,6 +1,6 @@
 import React from "react";
 import SeoulImage from '../assets/Seoul.png'
-
+import { useNavigate } from 'react-router-dom';
 function Seoul() {
   const dummyData = [
     { id: 1, title: "명동", image: SeoulImage },
@@ -14,6 +14,7 @@ function Seoul() {
     { id: 9, title: "코엑스", image: SeoulImage },
     { id: 10, title: "롯데월드", image: SeoulImage }
   ];
+  const navigate = useNavigate();
 
   return (
     <div style={{ marginBottom: '70px' }}>
@@ -26,6 +27,7 @@ function Seoul() {
           </div>
         ))}
       </div>
+      <button onClick={() => navigate('/reservation')}>예약 페이지로 이동</button>
     </div>
   );
 }

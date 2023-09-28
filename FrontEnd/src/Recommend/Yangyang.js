@@ -1,6 +1,6 @@
 import React from "react";
 import YangImage from '../assets/Yangyang.png'
-
+import { useNavigate } from 'react-router-dom';
 
 function Yangyang() {
   const dummyData = [
@@ -15,6 +15,7 @@ function Yangyang() {
     { id: 9, title: "해물탕 전문점", image: YangImage },
     { id: 10, title: "양양 횟집", image: YangImage }
   ];
+  const navigate = useNavigate();
 
   return (
     <div style={{ marginBottom: '70px' }}>
@@ -27,6 +28,7 @@ function Yangyang() {
           </div>
         ))}
       </div>
+      <button onClick={() => navigate('/reservation')}>예약 페이지로 이동</button>
     </div>
   );
 }

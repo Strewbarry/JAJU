@@ -1,5 +1,5 @@
 import React from "react";
-
+import { useNavigate } from 'react-router-dom';
 import BusanImage from '../assets/Busan.png';
 import BusanImage2 from '../assets/Busan2.png';
 import BusanImage3 from '../assets/Busan3.png';
@@ -19,6 +19,7 @@ function Busan() {
     { id: 10, title: "부산 시티투어", image: BusanImage }
 
   ];
+  const navigate = useNavigate();
 
   return (
     <div style={{ marginBottom: '70px' }}>
@@ -31,6 +32,7 @@ function Busan() {
           </div>
         ))}
       </div>
+      <button onClick={() => navigate('/reservation')}>예약 페이지로 이동</button> {/* Step 3: Attach navigate function to button onClick */}
     </div>
   );
 }

@@ -26,6 +26,7 @@ const ZOOM_LEVEL = 16;
 const createIcon = (iconUrl) => new L.Icon({
   iconUrl,
   iconSize: [45, 45],
+  className: 'leaflet-circle-icon' // CSS 클래스 이름 추가
 });
 
 
@@ -189,13 +190,7 @@ function Map() {
               <GeoJSON data={lineStringData} />
             </MapContainer>
           </div>
-          {clickedPosition && (
-            <div className={styles.clickedPositionInfo}>
-              클릭된 위치: <br />
-              위도: {clickedPosition.lat} <br />
-              경도: {clickedPosition.lng}
-            </div>
-          )}
+
         </div>
       </div>
     </div>

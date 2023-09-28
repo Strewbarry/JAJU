@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styles from './Reservation.module.css';
 import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
+import {Url} from '../server_url';
+
 
 const Reservation = () => {
+  const url = Url
   const [region, setRegion] = useState('');
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('');
@@ -88,7 +91,7 @@ const Reservation = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await axios.post('http://192.168.100.38:3000/vehicle/find', {
+      const response = await axios.post(`${url}/vehicle/find`, {
         around_location: region,
         start_time: `${bookingDate}T${bookingTime}:${bookingMinutes}:00Z`,
         end_time: `${returnDate}T${returnTime}:${returnMinutes}:00Z`
@@ -122,7 +125,7 @@ const Reservation = () => {
     try {
       const token = localStorage.getItem('token');
   
-      const response = await axios.post('http://192.168.100.38:3000/vehicle/find', {
+      const response = await axios.post(`${url}/vehicle/find`, {
         around_location: region,
         start_time: `${bookingDate}T${bookingTime}:${bookingMinutes}:00Z`,
         end_time: `${returnDate}T${returnTime}:${returnMinutes}:00Z`

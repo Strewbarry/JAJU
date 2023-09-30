@@ -1,0 +1,47 @@
+.checkReservationContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /* 중앙 정렬을 위한 스타일 */
+    padding: 30px;  /* 패딩 추가 */
+    font-family: Arial, sans-serif;  /* 기본 폰트 변경 */
+    background-color: #f6f6f6;  /* 배경색 변경 */
+    border-radius: 10px;  /* 모서리 둥글게 */
+    margin-bottom: 40px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;  /* 여백 추가 */
+    text-align: center;  /* 텍스트 중앙 정렬 */
+}
+
+.reservationDetail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  /* 그림자 효과 */
+    margin-bottom: 20px;
+}
+
+.reservationDetail p {
+    margin-bottom: 10px;
+    text-align: center;  /* 텍스트 중앙 정렬 */
+}
+
+.confirmButton {
+    padding: 10px 20px;
+    background-color: #007BFF;  /* 버튼 배경색 */
+    color: #fff;  /* 버튼 글자색 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;  /* 트랜지션 효과 */
+}
+
+.confirmButton:hover {
+    background-color: #0056b3;  /* 호버 효과 */
+}

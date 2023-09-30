@@ -22,6 +22,8 @@ function SeeReservation() {
         setSelectedId(id);
         setModalMessage("정말 취소하시겠습니까?");
         setShowModal(true);
+        
+
     };
 
     const handleConfirm = async () => {
@@ -39,6 +41,7 @@ function SeeReservation() {
             setError('Error cancelling the reservation');
         } finally {
             setLoading(false); // 로딩 종료
+            window.location.reload();
         }
     }
 
@@ -94,7 +97,9 @@ function SeeReservation() {
                         <p>예상 가격:{reservation.price}원</p>
                         <p>차량 번호: {reservation.car_info[0].car_number}</p>
                         <p>차량종류: {reservation.car_info_id}</p>
+                        <p>호출지역 : {reservation.region}</p>
                         <p>하드코딩하면 장소어딘지 :</p>
+
                         <button onClick={() => handleCancelReservation(reservation.id)} className={styles.cancelButton}>예약 취소하기</button>
                     </div>
                     

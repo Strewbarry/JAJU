@@ -12,6 +12,8 @@ function CheckReservation() {
     const [selectedLatitude, setSelectedLatitude] = useState('');
     const [selectedLongitude, setSelectedLongitude] = useState('');
     const selectedCarFee = localStorage.getItem('selectedCarFee'); // 문자열로 저장된 값을 가져옵니다.
+    const storedRegion = localStorage.getItem('selectedRegion');
+
     const navigate = useNavigate();
     useEffect(() => {
         setBookingDateTime(localStorage.getItem('bookingDateTime') || '');
@@ -19,6 +21,7 @@ function CheckReservation() {
         setSelectedCar(localStorage.getItem('selectedCarId') || '');
         setSelectedLatitude(localStorage.getItem('selectedLatitude') || '');
         setSelectedLongitude(localStorage.getItem('selectedLongitude') || '');
+
     }, []);
     
     const handleReservationConfirmation = async () => {
@@ -37,6 +40,7 @@ function CheckReservation() {
                 lat: selectedLatitude,
                 lng: selectedLongitude,
                 price: selectedCarFee,
+                region: storedRegion,
             }, 
             {
                 headers: { 'authorization': token }
@@ -58,6 +62,7 @@ function CheckReservation() {
             <p className={styles.title}>예약 내역 확인 페이지</p>
             
             <div className={styles.reservationDetail}>
+                <p>호출지역: {storedRegion}</p>
                 <p>예약 시간: {bookingDateTime.replace('T', ' ')}</p>
                 <p>반납 시간: {returnDateTime.replace('T', ' ')}</p>
                 <p>선택한 차량: {selectedCarId}</p>

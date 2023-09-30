@@ -1,4 +1,8 @@
-const Redis = require('ioredis');
+
+
+// Redis에 값을 저장
+async function setValue (a, select) {
+    const Redis = require('ioredis');
 
 // Redis 서버에 연결
 const redis = new Redis({
@@ -6,9 +10,6 @@ const redis = new Redis({
   port: 6379, // Redis 기본 포트
   password: 'c104' // 설정된 경우에만 필요
 });
-
-// Redis에 값을 저장
-async function setValue (a, select) {
   try {
     if ( select === 1) {
 
@@ -29,6 +30,6 @@ async function setValue (a, select) {
 }
 const a = 'asdf'
 const b = 'as'
-setValue(a, 1);
+// setValue(a, 1);
 
 module.exports = {setValue}

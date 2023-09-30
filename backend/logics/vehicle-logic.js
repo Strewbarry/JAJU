@@ -1,32 +1,34 @@
 
-const Redis = require('ioredis');
+// const Redis = require('ioredis');
 
-// Redis 서버에 연결
-const redis = new Redis({
-  host: 'j9c104.p.ssafy.io',
-  port: 6379, // Redis 기본 포트
-  password: 'c104' // 설정된 경우에만 필요
-});
-async function setValue (a, select) {
-    try {
-      if ( select === 1) {
+// // Redis 서버에 연결
+// const redis = new Redis({
+//   host: 'j9c104.p.ssafy.io',
+//   port: 6379, // Redis 기본 포트
+//   password: 'c104' // 설정된 경우에만 필요
+// });
+
+// async function setValue (a, select) {
+//     try {
+//       if ( select === 1) {
   
-          // const x = a.toString()
-          // const y = b.toString()
-          await redis.set('status', 'start')
-          await redis.set('cmd', a);
-          console.log('값이 설정되었습니다.');
-      }
-      else {
-          await redis.set('status', 'stop')
-      }
-    } catch (error) {
-      console.error('오류 발생:', error);
-    } finally {
-      redis.quit(); // 연결 종료
-    }
-  }
-
+//           // const x = a.toString()
+//           // const y = b.toString()
+//           await redis.set('status', 'start')
+//           await redis.set('cmd', a);
+//           console.log('값이 설정되었습니다.');
+//       }
+//       else {
+//           await redis.set('status', 'stop')
+//       }
+      
+//     } catch (error) {
+//       console.error('오류 발생:', error);
+//     } finally {
+//     //   redis.quit(); // 연결 종료
+//     }
+//   }
+const { setValue } = require("../utils/redis-logic.js")
 const connection = require("../utils/database.js")
 
 // 설정한 지역과 시간에 예약이 가능한 차량 정보 불러오기

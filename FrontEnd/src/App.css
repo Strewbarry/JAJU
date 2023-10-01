@@ -4,6 +4,10 @@ body {
   background-color: #f7e6f3; /* 밝은 자주빛 배경색 */
 }
 
+.leaflet-bottom.leaflet-right {
+  display: none;
+}
+
 /* 모든 버튼에 공통적으로 적용할 기본 스타일 */
 .map-buttons button {
   position: relative; 

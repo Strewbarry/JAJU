@@ -24,7 +24,6 @@ import Yangyang from './Recommend/Yangyang';
 import Seoul from './Recommend/Seoul';
 import Busan from './Recommend/Busan';
 
-
 function MainPage() {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);

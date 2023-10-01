@@ -35,7 +35,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .modalContent {
@@ -47,11 +47,35 @@
   text-align: center;
 }
 
-.closeButton {
-  position: absolute;
-  right: 10px;
-  top: 10px;
+
+/* 확인 버튼 스타일 */
+.confirmButton {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 10px;
   cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.confirmButton:hover {
+  background-color: #45a049;
 }
 
 /* 기타 추가 스타일은 필요에 따라 정의하시면 됩니다. */
+/* 취소 버튼 스타일 */
+.cancelModalButton {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.cancelModalButton:hover {
+  background-color: #da190b;
+}

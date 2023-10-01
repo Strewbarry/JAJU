@@ -236,7 +236,7 @@ return (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <span className={styles.closeButton} onClick={() => setShowModal(false)}>X</span>
-            이용할 수 있는 차량이 없습니다.
+            이용 가능한 차량이 없습니다.
           </div>
         </div>
       )}

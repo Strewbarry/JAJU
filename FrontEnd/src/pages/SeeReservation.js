@@ -111,10 +111,9 @@ function SeeReservation() {
             {showModal && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <span className={styles.closeButton} onClick={handleCancel}>X</span>
-                        {modalMessage}
-                        <button onClick={handleConfirm}>확인</button>
-                        <button onClick={handleCancel}>취소</button>
+                        <p className={styles.modalMessage}>{modalMessage}</p>
+                        <button className={styles.confirmButton} onClick={handleConfirm}>확인</button>
+                        <button className={styles.cancelModalButton} onClick={handleCancel}>취소</button>
                     </div>
                 </div>
             )}

@@ -40,7 +40,7 @@ const markers = [
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
   { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '술집' },
-  { position: [37.239984102516516, 126.77420129836432], icon: childrenIcon, label: '학교' }, // 학교
+  { position: [37.239984102516516, 126.77420129836432], icon: childrenIcon, label: '어린이보호구역' }, // 학교
   { position: [37.24329834268778, 126.77522987905812], icon: defaultIcon, label: '공사중 막혀서 돌아감' }, //
   { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
 

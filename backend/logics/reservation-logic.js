@@ -12,7 +12,7 @@ exports.make = async (req, res) => {
     const reservation_time = new Date(req.body.reservation_time)
     const return_time = new Date(req.body.return_time)
 
-    const sql = 'INSERT INTO reservation (`user_id`, `vehicle_id`, `reservation_time`, `return_time`,`region`, `lat`, `lng`, `price`) VALUES (?,?,?,?,?,?,?)'
+    const sql = 'INSERT INTO reservation (`user_id`, `vehicle_id`, `reservation_time`, `return_time`,`region`, `lat`, `lng`, `price`) VALUES (?,?,?,?,?,?,?,?)'
     const params = [user_id[0].id, req.body.vehicle_id, reservation_time, return_time, req.body.region, req.body.lat, req.body.lng, req.body.price]
 
     connection.query(sql, params, function (error, results, fields) {
@@ -46,7 +46,7 @@ exports.now = async (req, res) => {
     });
     const vehicle_id = req.body.vehicle_id
     const reservation_time = new Date()
-    const sql = 'INSERT INTO reservation (`user_id`, `vehicle_id`, `reservation_time`,`return_time`, `region`, `lat`, `lng`) VALUES (?,?,?,?,?,?)'
+    const sql = 'INSERT INTO reservation (`user_id`, `vehicle_id`, `reservation_time`,`return_time`, `region`, `lat`, `lng`) VALUES (?,?,?,?,?,?,?)'
     const params = [user_id[0].id, vehicle_id, reservation_time,reservation_time, req.body.region, req.body.lat, req.body.lng]
 
     connection.query(sql, params, function (error, results, fields) {

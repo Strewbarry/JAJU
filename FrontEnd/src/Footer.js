@@ -29,9 +29,9 @@ function Footer() {
   return (
     <footer className={styles.footer}>
       <p> 
-        이용내역 | 
+        <span>이용내역</span> | 
         <span onClick={sendNotification} style={{ cursor: 'pointer' }}>알림</span> | 
-        FAQ
+        <span>FAQ</span>
       </p>
       {/* 여기에 다른 내용이나 링크를 추가할 수 있습니다 */}
     </footer>

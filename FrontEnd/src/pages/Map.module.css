@@ -79,6 +79,69 @@
   transition: background-color 0.3s; /* 배경색 변경 트랜지션 */
 }
 
-.returnButton:hover {
-  background-color: #0056b3; /* 마우스 오버 시 조금 더 진한 파란색으로 변경 */
+
+
+.callVehicleButton {
+  background-color: #4CAF50;  /* Green background */
+  border: none;               /* No border */
+  color: white;               /* White text */
+  padding: 10px 20px;        /* Some padding */
+  text-align: center;        /* Centered text */
+  text-decoration: none;     /* No underline */
+  display: inline-block;     /* Inline-block */
+  font-size: 16px;           /* Big font size */
+  margin: 4px 2px;           /* Some margin */
+  cursor: pointer;           /* Pointer/hand icon */
+  border-radius: 4px;        /* Rounded corners */
+  transition-duration: 0.4s; /* Transition effect */
+}
+
+.destinationButton {
+  padding: 10px 20px;
+  background-color: #3498db; /* 파란색 배경 */
+  color: #ffffff; /* 흰색 글자 */
+  border: 1px solid #2980b9; /* 조금 더 진한 파란색 보더 */
+  border-radius: 5px; /* 버튼 모서리 둥글게 */
+  cursor: pointer; /* 마우스 커서를 손가락 모양으로 변경 */
+  transition: background-color 0.3s; /* 배경색 변경 애니메이션 */
+}
+
+.centerContent {
+  font-size: 17px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* 필요하다면 100%로 설정 */
+  height: 100%; /* 필요하다면 높이를 지정해 줄 수 있습니다 */
+}
+
+
+/* Map.module.css에 추가 */
+
+.confirmButton, .cancelButton {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-size: 16px;
+  margin: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.confirmButton {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: #45a049;
+}
+
+.cancelButton {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #d32f2f;
 }

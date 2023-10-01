@@ -10,7 +10,7 @@ function SeeReservation() {
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
     const [selectedId, setSelectedId] = useState(null); // 삭제할 예약 ID를 임시 저장하기 위한 상태
-    const [loading, setLoading] = useState(false); // 로딩 상태 추가
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleCancelReservation = (id) => {
         const token = localStorage.getItem('token');
@@ -27,7 +27,7 @@ function SeeReservation() {
     };
 
     const handleConfirm = async () => {
-        setLoading(true); // 로딩 시작
+
         try {
             const token = localStorage.getItem('token');
             await axios.delete(`${url}/reservation/delete/${selectedId}`, {
@@ -40,7 +40,7 @@ function SeeReservation() {
             console.error(err);
             setError('Error cancelling the reservation');
         } finally {
-            setLoading(false); // 로딩 종료
+
             window.location.reload();
         }
     }
@@ -52,10 +52,10 @@ function SeeReservation() {
 
     useEffect(() => {
         const fetchReservations = async () => {
-            setLoading(true); // 로딩 시작
             const token = localStorage.getItem('token'); 
             if(!token) {
                 setError('User is not authenticated');
+                setIsLoading(false);
                 return;
             }
 
@@ -63,29 +63,32 @@ function SeeReservation() {
                 const response = await axios.get(`${url}/user/reservation`, {
                     headers: { 'authorization': token }
                 });
-                
-                setReservations(response.data);
 
-                            // 여기서 reservations 값을 출력합니다.
+                setReservations(response.data);
                 console.log(response.data);
             } catch (err) {
                 console.error(err);
                 setError('Error fetching reservation data');
             } finally {
-                setLoading(false); // 로딩 종료
+                setTimeout(() => {
+                    setIsLoading(false);
+                }, 300);
             }
         };
 
         fetchReservations();
     }, []);
+
+    if (isLoading) {
+        return <div className={styles.loading}>Loading&#8230;</div>;
+    }
+
     
     return (
         <div className={styles.container}>
             <p>예약내역확인</p>
-            {  loading ? (
-                    <p>Loading...</p>
-                ) : reservations.length > 0 ? (
-                    reservations.map((reservation, index) => (
+            {reservations.length > 0 ? (
+                reservations.map((reservation, index) => (
                     <div key={index} className={styles.reservationItem}>
                         {/* <p>아이디: {reservation.id}</p> */}
                         <p>위도: {reservation.lat}</p>
@@ -99,15 +102,14 @@ function SeeReservation() {
                         <p>차량종류: {reservation.car_info_id}</p>
                         <p>호출지역 : {reservation.region}</p>
                         <p>하드코딩하면 장소어딘지 :</p>
-
+    
                         <button onClick={() => handleCancelReservation(reservation.id)} className={styles.cancelButton}>예약 취소하기</button>
                     </div>
-                    
                 ))
             ) : (
                 <p>예약내역이 없습니다</p>
             )}
-            
+    
             {showModal && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
@@ -118,7 +120,7 @@ function SeeReservation() {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 export default SeeReservation;

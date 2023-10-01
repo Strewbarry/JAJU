@@ -4,26 +4,43 @@ import axios from 'axios';
 import styles from './CheckReservation.module.css';
 import {Url} from '../server_url';
 
+function Modal({ show, onClose, children }) {
+    if (!show) return null;
+
+    return (
+        <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+                {children}
+                <button onClick={onClose}>닫기</button>
+            </div>
+        </div>
+    );
+}
+
+
+
 function CheckReservation() {
-    const url = Url
+    const url = Url;
     const [bookingDateTime, setBookingDateTime] = useState('');
     const [returnDateTime, setReturnDateTime] = useState('');
     const [selectedCarId, setSelectedCar] = useState('');
     const [selectedLatitude, setSelectedLatitude] = useState('');
     const [selectedLongitude, setSelectedLongitude] = useState('');
-    const selectedCarFee = localStorage.getItem('selectedCarFee'); // 문자열로 저장된 값을 가져옵니다.
+    const selectedCarFee = localStorage.getItem('selectedCarFee');
     const storedRegion = localStorage.getItem('selectedRegion');
 
     const navigate = useNavigate();
+
     useEffect(() => {
         setBookingDateTime(localStorage.getItem('bookingDateTime') || '');
         setReturnDateTime(localStorage.getItem('returnDateTime') || '');
         setSelectedCar(localStorage.getItem('selectedCarId') || '');
         setSelectedLatitude(localStorage.getItem('selectedLatitude') || '');
         setSelectedLongitude(localStorage.getItem('selectedLongitude') || '');
-
     }, []);
     
+    const [isModalOpen, setModalOpen] = useState(false);
+
     const handleReservationConfirmation = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -32,7 +49,6 @@ function CheckReservation() {
         }
         
         try {
-
             const response = await axios.post(`${url}/reservation/make`, {
                 vehicle_id: selectedCarId,
                 reservation_time: bookingDateTime,
@@ -41,26 +57,27 @@ function CheckReservation() {
                 lng: selectedLongitude,
                 price: selectedCarFee,
                 region: storedRegion,
-            }, 
-            {
+            }, {
                 headers: { 'authorization': token }
-            }
-            
-);
+            });
+
             console.log('Reservation Confirmation Response:', response.data);
-            if (response.status === 200){
-                alert('예약이 완료되었습니다')
-                navigate('/seereservation')
+            if (response.status === 200) {
+                setModalOpen(true);
             }
         } catch (error) {
             console.error('Reservation Confirmation Error:', error);
         }
     };
-    
+
+    const closeModal = () => {
+        setModalOpen(false);
+        navigate('/seereservation');
+    };
+
     return (
         <div className={styles.checkReservationContainer}>
             <p className={styles.title}>예약 내역 확인 페이지</p>
-            
             <div className={styles.reservationDetail}>
                 <p>호출지역: {storedRegion}</p>
                 <p>예약 시간: {bookingDateTime.replace('T', ' ')}</p>
@@ -69,10 +86,13 @@ function CheckReservation() {
                 <p>호출할 지역: 위도 {selectedLatitude}, 경도 {selectedLongitude}</p>
                 <p>예상 가격: {selectedCarFee}원</p>
             </div>
-            
             <button onClick={handleReservationConfirmation} className={styles.confirmButton}>
                 예약 확정
             </button>
+
+            <Modal show={isModalOpen} onClose={closeModal}>
+                <p>예약이 완료되었습니다</p>
+            </Modal>
         </div>
     );
 }

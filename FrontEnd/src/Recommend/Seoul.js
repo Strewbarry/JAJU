@@ -1,4 +1,5 @@
 import React from "react";
+import styles from './Seoul.module.css';
 import SeoulImage from '../assets/Seoul.png'
 import SeoulImage2 from '../assets/Seoul2.png'
 import SeoulImage3 from '../assets/Seoul3.png'
@@ -37,7 +38,7 @@ function Seoul() {
           </div>
         ))}
       </div>
-      <button onClick={() => navigate('/reservation')}>예약 페이지로 이동</button>
+      <button className={styles.reservationButton} onClick={() => navigate('/reservation')}>예약 페이지로 이동</button>
     </div>
   );
 }

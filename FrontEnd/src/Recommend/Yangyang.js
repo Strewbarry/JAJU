@@ -1,4 +1,5 @@
 import React from "react";
+import styles from './Yangyang.module.css';
 import YangImage from '../assets/Yangyang.png'
 import YangImage2 from '../assets/Yangyang2.png'
 import YangImage3 from '../assets/Yangyang3.png'
@@ -37,7 +38,7 @@ function Yangyang() {
           </div>
         ))}
       </div>
-      <button onClick={() => navigate('/reservation')}>예약 페이지로 이동</button>
+      <button className={styles.reservationButton} onClick={() => navigate('/reservation')}>예약 페이지로 이동</button>
     </div>
   );
 }

@@ -9,6 +9,7 @@
     margin-bottom: 60px;
     margin-top: 20px;
     border-radius: 10px; /* 모서리 부드럽게 처리 */
+    margin: 0 10px;
   }
   
   .slideImage {

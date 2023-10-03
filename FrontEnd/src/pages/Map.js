@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect , useState } from 'react';
 import { Url } from '../server_url';
 import axios from 'axios';
 import styles from './Map.module.css';
@@ -8,7 +8,7 @@ import osm2 from "../osm-providers2";
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 // import ROSLIB from 'roslib';
-import pathData from '../Path.json';
+
 import placeholderImage from '../assets/placeholder.png';
 import HotelImage from '../assets/Hotel.png';
 import coffeeImage from '../assets/coffee.png';
@@ -18,6 +18,10 @@ import beerImage from '../assets/beer.png';
 import childrenImage from '../assets/children.png';
 import airportImage from '../assets/Airport.png';
 import barrierImage from '../assets/barrier.png';
+
+
+import ROSLIB from 'roslib';
+import proj4 from 'proj4';
 
 const url = Url
 
@@ -46,7 +50,7 @@ const airportIcon = createIcon2(airportImage)
 
 const markers = [
   { position: [37.245428193272716, 126.7750329522217], icon: hotelIcon, label: '스탠포드호텔' },
-  { position: [37.23918867370749, 126.77313034628662], icon: airportIcon, label: 'Start 지점[제주공항]' },
+  // { position: [37.23918867370749, 126.77313034628662], icon: airportIcon, label: 'Start 지점[제주공항]' },
   { position: [37.24068299201391, 126.77130810123954], icon: restaurantIcon, label: '한국식 소고기 전문 음식점 [ 배꼽집]' },
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
@@ -72,6 +76,20 @@ function Map() {
   // 예약 정보를 저장하기 위한 상태 추가
 
   const [vehicleId, setVehicleId] = useState(null); // to store vehicle id
+
+  const [position, setPosition] = useState([37.23918867370749, 126.77313034628662]);
+
+  const utmProjection = "+proj=utm +zone=52";
+  const wgs84Projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+  let east = 0;
+  let north = 0;
+  let result = 0;
+  let ros = new ROSLIB.Ros({
+    url: 'ws://13.124.128.202:9090', // ROS Bridge WebSocket URL
+  });
+
+  let storedLocations = localStorage.getItem('locations');
+  let pathData = storedLocations ? JSON.parse(storedLocations) : [];
 
   const returnVehiclePrompt = () => {
     setModalContent('return');
@@ -136,13 +154,98 @@ function Map() {
     }
   };
   
+  useEffect(() => {
+
+    ros = new ROSLIB.Ros({
+    url: 'ws://13.124.128.202:9090', // ROS Bridge WebSocket URL
+  });
+
+    ros.on('connection', () => {
+      console.log('Connected to ROS Bridge');
+
+    });
+
+    ros.on('error', (error) => {
+      console.error('Error connecting to ROS Bridge: ', error);
+    });
+
+    ros.on('close', () => {
+      console.log('Connection to ROS Bridge closed');
+    });
+    
+
+    return () => {
+      ros.close();
+    };
+  }, []);
+  function subscribe() {
+    const GPS_topic_listner = new ROSLIB.Topic({
+        ros: ros,
+        name: "/gps",
+        messageType: "morai_msgs/GPSMessage"
+    });
+
+    GPS_topic_listner.subscribe(function(data){
+        // 위도와 경도 값을 상태로 설정
+        setPosition([data.latitude, data.longitude]);
+    });
+}
+
+
+  function utmTogps(east,north){
+    let coords = proj4(utmProjection, wgs84Projection, [east,north]);
+    return {
+      latitude: coords[1],
+      longitude: coords[0]
+    };
+  }
+
+  function subscribe2() {
+    const GPS_topic_listner = new ROSLIB.Topic({
+        ros: ros,
+        name: "/global_path",
+        messageType: "nav_msgs/Path"
+    });
+    
+
+
+    GPS_topic_listner.subscribe(function(data){
+
+        // 배열 초기화
+        let locations = [];
+
+        // for문 돌려서 경로 재탐색
+        for(let i = 0; i < data.poses.length; i++) {
+            let east = data.poses[i].pose.position.x + 302459.942;
+            let north = data.poses[i].pose.position.y + 4122635.537;
+            
+            // console.log(east, north);
+
+            let result = utmTogps(east, north);
+            // console.log(result.latitude, result.longitude);
+            
+            // 결과를 locations 배열에 추가
+            locations.push([
+                result.longitude,
+                result.latitude
+            ]);
+        }
+        console.log(locations);  // 전체 위치 데이터를 출력
+        localStorage.setItem('locations', JSON.stringify(locations));
+
+        // 메시지를 받은 후 즉시 구독 취소
+        GPS_topic_listner.unsubscribe();
+    });
+    
+    console.log('제잘');
+}
 
 
   const RenderMarkers = () => {
     return markers.map((marker, index) => (
       <Marker key={index} position={marker.position} icon={marker.icon}>
         <Popup>
-
+        
           <div className={styles.centerContent}>
             <b>{marker.label}</b>
           </div>
@@ -232,7 +335,9 @@ function Map() {
 
   return (
     <div>
-
+      <button onClick={() => subscribe()}>차 실시간 위치 확인하기</button>
+      <button onClick={() => subscribe2()}>경로 탐색</button>
+      
       <div className={styles.row}>
         <div className={`${styles.col} ${styles.textCenter}`}>
           <div className={styles.col}>
@@ -243,6 +348,8 @@ function Map() {
               </div>
               <TileLayer url={mapType === 'normal' ? osm.maptiler.url : osm2.maptiler.url} attribution={mapType === 'normal' ? osm.maptiler.attribution : osm2.maptiler.attribution} />
               <MapEvents />
+              <Marker position={position} icon={airportIcon} label='Start 지점[제주공항]' />
+
               <RenderMarkers />
               <GeoJSON data={lineStringData} />
               {isRented && (

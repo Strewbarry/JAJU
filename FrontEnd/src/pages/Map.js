@@ -59,7 +59,7 @@ const markers = [
   { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '술집' },
 
   { position: [37.24329834268778, 126.77522987905812], icon: barrierIcon, label: '공사중 막혀서 돌아감' }, //
-  { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
+  // { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
   { position: [37.23854529782744, 126.77299597702779], icon: defaultIcon, label: '주차장' }, //  
   { position: [37.239071349649535, 126.77305532061546], icon: defaultIcon, label: '호출지' }, //
   { position: [37.24000507292737, 126.77429711745246], icon: beerIcon, label: '마라탕집' }, //
@@ -74,7 +74,7 @@ function Map() {
   const [clickedLongitude, setClickedLongitude] = useState(null);
   const [mapType, setMapType] = useState('normal');
   const [modalContent, setModalContent] = useState('reserve');
-  const [isStopped, setIsStopped] = useState(false);
+
 
   const [showModal, setShowModal] = useState(false);
 
@@ -233,6 +233,7 @@ function Map() {
       if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
         (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
         console.log("목적지에 도착했습니다.");
+        // usestate + modal() 이런 함수 띄워서 도착 표시하기 
       } else {
         // console.log(data.latitude);
         // console.log(data.longitude);
@@ -457,11 +458,8 @@ function Map() {
               {isRented && (
                 <div className={styles.returnButtonContainer}>
                   <button onClick={returnVehiclePrompt} className={styles.returnButton}>반납하기</button>
-                  {isStopped ? (
-                    <button className={styles.startButton} onClick={() => setIsStopped(false)}>출발하기</button>
-                  ) : (
-                    <button className={styles.stopButton} onClick={() => setIsStopped(true)}>정지하기</button>
-                  )}
+                  <button className={styles.stopButton}>정지하기</button>
+
                 </div>
               )}
 

@@ -3,7 +3,6 @@
 
 import rospy
 import rospkg
-import redis
 from math import cos,sin,pi,sqrt,pow,atan2
 from geometry_msgs.msg import Point,Point32,PoseWithCovarianceStamped
 from nav_msgs.msg import Odometry,Path
@@ -55,12 +54,8 @@ class pure_pursuit :
         rospy.Subscriber("odom", Odometry, self.odom_callback)
         rospy.Subscriber("/Ego_topic", EgoVehicleStatus, self.status_callback)
         rospy.Subscriber("/Object_topic", ObjectStatusList, self.object_info_callback)
-        rospy.Subscriber("/LightVel", Float64, self.light_vel_callback)
-        rospy.Subscriber("/KidsVel", Float64, self.kids_vel_callback)
-        rospy.Subscriber("/stop_sign_detected", Bool, self.stop_callback)
 
-        self.ctrl_cmd_pub = rospy.Publisher('ctrl_cmd',CtrlCmd, queue_size=1)
-        r = redis.Redis(host='j9c104.p.ssafy.io', port=6379, password='c104', db=0, charset="utf-8", decode_responses=True)
+        self.ctrl_cmd_pub = rospy.Publisher('ctrl_cmd',CtrlCmd, queue_size=100)
 
         self.ctrl_cmd_msg = CtrlCmd()
         self.ctrl_cmd_msg.longlCmdType = 1
@@ -69,8 +64,6 @@ class pure_pursuit :
         self.is_odom = False
         self.is_status = False
         self.is_global_path = False
-        self.is_stop = False
-        self.cnt = 0
 
         self.is_look_forward_point = False
 
@@ -79,10 +72,10 @@ class pure_pursuit :
 
         self.vehicle_length = 2.7
         self.lfd = 8
-        self.min_lfd = 5
+        self.min_lfd = 3
         self.max_lfd = 30
         self.lfd_gain = 0.8
-        self.target_velocity = 50
+        self.target_velocity = 15
         self.dis = 999
 
         self.pid = pidControl()
@@ -91,19 +84,13 @@ class pure_pursuit :
 
         while True:
             if self.is_global_path == True:
-                self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
+                self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 15)
                 break
             else:
                 rospy.loginfo('Waiting global path data')
 
         rate = rospy.Rate(10) # 10hz
         while not rospy.is_shutdown():
-
-            if self.is_stop and self.cnt == 0:
-                self.is_global_path = False
-                self.cnt = 1
-                self.velocity_list = self.vel_planning.curvedBaseVelocity(self.global_path, 50)
-                self.is_global_path = True
 
             if self.is_global_path == True and self.is_path == True and self.is_odom == True and self.is_status == True:
 
@@ -128,8 +115,6 @@ class pure_pursuit :
                     
                     self.target_velocity = self.adaptive_cruise_control.get_target_velocity(local_npc_info, local_ped_info, local_obs_info, self.status_msg.velocity.x, self.target_velocity / 3.6)
 
-                    self.target_velocity = min(self.target_velocity, self.light_vel, self.kids_vel)
-
                     output = self.pid.pid(self.target_velocity, self.status_msg.velocity.x * 3.6)
                         
                     if self.target_velocity < 5:
@@ -146,8 +131,6 @@ class pure_pursuit :
                     rospy.loginfo("no found forward point")
                     self.ctrl_cmd_msg.steering = 0.0
                     self.ctrl_cmd_msg.brake = 1.0
-                    self.ctrl_cmd_pub.publish(self.ctrl_cmd_msg)
-                    r.set('status', 'finish')
 
                 #TODO: (10) 제어입력 메세지 Publish
 
@@ -180,15 +163,6 @@ class pure_pursuit :
     def object_info_callback(self,msg): ## Object information Subscriber
         self.is_object_info = True
         self.object_data = msg
-
-    def light_vel_callback(self,msg):
-        self.light_vel = msg.data
-
-    def kids_vel_callback(self,msg):
-        self.kids_vel = msg.data
-
-    def stop_callback(self,msg):
-        self.is_stop = msg.data
 
     def get_current_waypoint(self,ego_status,global_path):
         min_dist = float('inf')
@@ -419,7 +393,7 @@ class velocityPlanning:
             out_vel_plan.append(v_max)
 
         for i in range(len(gloabl_path.poses) - point_num, len(gloabl_path.poses)-10):
-            out_vel_plan.append(30)
+            out_vel_plan.append(10)
 
         for i in range(len(gloabl_path.poses) - 10, len(gloabl_path.poses)):
             out_vel_plan.append(0)
@@ -581,12 +555,11 @@ class AdaptiveCruiseControl:
             # Pedestrian = [local_ped_info[self.Person[1]][1], local_ped_info[self.Person[1]][2], local_ped_info[self.Person[1]][3]]
 
             # self.object_distance = sqrt(pow(Pedestrian[0],2) + pow(Pedestrian[1],2))
-            #default_space = 15
+            default_space = 15
 
-            #if self.object_distance < default_space:
-            out_vel = 0
-
-        """
+            if self.object_distance < default_space:
+                out_vel = 0
+   
         if self.object[0] and len(local_obs_info) != 0: #ACC ON_obstacle     
             print("ACC ON Obstacle")                    
             Obstacle = [local_obs_info[self.object[1]][1], local_obs_info[self.object[1]][2], local_obs_info[self.object[1]][3]]
@@ -595,7 +568,7 @@ class AdaptiveCruiseControl:
             default_space = 15
 
             if self.object_distance < default_space:
-                out_vel = 0"""
+                out_vel = 0
 
         return out_vel * 3.6
 

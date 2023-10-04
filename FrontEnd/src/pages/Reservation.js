@@ -228,9 +228,9 @@ return (
       </div>
       <div className={styles.field}>
         <button onClick={checkInputAndNavigate} className={styles.viewCarsButton}>이용 가능 차량 보기</button>
-        <div className={styles.field}>
+        {/* <div className={styles.field}>
           <button onClick={handleFindVehicle} className={styles.findVehicleButton}>콘솔로 찍어보기</button>
-        </div>
+        </div> */}
       </div>
       {showModal && (
         <div className={styles.modal}>

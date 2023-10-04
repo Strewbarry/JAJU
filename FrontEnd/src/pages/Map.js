@@ -1,4 +1,4 @@
-import React, { useEffect , useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Url } from '../server_url';
 import axios from 'axios';
 import styles from './Map.module.css';
@@ -18,6 +18,7 @@ import beerImage from '../assets/beer.png';
 import childrenImage from '../assets/children.png';
 import airportImage from '../assets/Airport.png';
 import barrierImage from '../assets/barrier.png';
+import tanghuluImage from '../assets/tanghulu.png';
 import CircleImage from '../assets/Circle.png'
 
 import ROSLIB from 'roslib';
@@ -47,21 +48,22 @@ const beerIcon = createIcon(beerImage);
 const childrenIcon = createIcon(childrenImage)
 const barrierIcon = createIcon(barrierImage)
 const airportIcon = createIcon2(airportImage)
-const CircleIcon = createIcon2(CircleImage)
+const CircleIcon = createIcon(CircleImage)
+const tanghuluIcon = createIcon(tanghuluImage)
 const markers = [
   { position: [37.245428193272716, 126.7750329522217], icon: hotelIcon, label: '스탠포드호텔' },
-  // { position: [37.23918867370749, 126.77313034628662], icon: airportIcon, label: 'Start 지점[제주공항]' },
+
   { position: [37.24068299201391, 126.77130810123954], icon: restaurantIcon, label: '한국식 소고기 전문 음식점 [ 배꼽집]' },
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
   { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '술집' },
-  // { position: [37.239984102516516, 126.77420129836432], icon: childrenIcon, label: '어린이보호구역' }, // 학교
+
   { position: [37.24329834268778, 126.77522987905812], icon: barrierIcon, label: '공사중 막혀서 돌아감' }, //
-  { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
+  // { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
   { position: [37.23854529782744, 126.77299597702779], icon: defaultIcon, label: '주차장' }, //  
-  { position: [37.239071349649535, 126.77305532061546  ], icon: defaultIcon, label: '호출지' }, //
-  { position: [37.24000507292737, 126.77429711745246  ], icon: beerIcon, label: '마라탕집' }, //
-  { position: [37.2430196110599, 126.77451974507942  ], icon: defaultIcon, label: '탕후루집' }, //
+  { position: [37.239071349649535, 126.77305532061546], icon: defaultIcon, label: '호출지' }, //
+  { position: [37.24000507292737, 126.77429711745246], icon: beerIcon, label: '마라탕집' }, //
+  { position: [37.2430196110599, 126.77451974507942], icon: tanghuluIcon, label: '탕후루집' }, //
 
 ];
 
@@ -73,6 +75,7 @@ function Map() {
   const [mapType, setMapType] = useState('normal');
   const [modalContent, setModalContent] = useState('reserve');
 
+
   const [showModal, setShowModal] = useState(false);
 
   const [carInfo, setCarInfo] = useState({ name: '', number: '', fuel_left: '' });
@@ -82,6 +85,8 @@ function Map() {
   const [vehicleId, setVehicleId] = useState(null); // to store vehicle id
 
   const [position, setPosition] = useState([0, 126.77313034628662]);
+
+  const [reservationId, setReservationId] = useState(null); 
 
   const utmProjection = "+proj=utm +zone=52";
   const wgs84Projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
@@ -98,7 +103,9 @@ function Map() {
   const returnVehiclePrompt = () => {
     setModalContent('return');
     setShowModal(true);
-  };
+    localStorage.removeItem('locations');  // Clear the 'locations' value from localStorage
+};
+
 
 
   const callVehicle = async (lat, lng) => {
@@ -149,20 +156,42 @@ function Map() {
 
   const returnVehicle = async () => {
     try {
+      if (reservationId) {
+        const token = localStorage.getItem('token');
+        const headers = {
+          'authorization': token,
+          'Content-Type': 'application/json'
+        };
+  
+        const response = await axios.put(`${url}/reservation/return`, 
+        { reservation_id: reservationId }, { headers });
+  
+        if (response.status === 200) {
+          console.log("Vehicle returned successfully!");
+          setReservationId(null);  // 예약이 성공적으로 반환된 후, reservationId를 초기화합니다.
+        } else {
+          console.error("Failed to return the vehicle");
+        }
+  
+      } else {
+        console.error("No reservation ID available for return");
+      }
+  
       setIsRented(false);
       setVehicleId(null);
       setShowModal(false); // 모달 창을 숨기는 코드 추가
-      console.log('Vehicle returned successfully');
+  
     } catch (error) {
       console.error('Error while returning the vehicle:', error);
     }
   };
   
+
   useEffect(() => {
 
     ros = new ROSLIB.Ros({
-    url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
-  });
+      url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
+    });
 
     ros.on('connection', () => {
       console.log('Connected to ROS Bridge');
@@ -170,13 +199,13 @@ function Map() {
     });
 
     ros.on('error', (error) => {
-      console.error('Error connecting to ROS Bridge: ', error);
+      console.error('Error connecting to ROS Bridge:markers ', error);
     });
 
     ros.on('close', () => {
       console.log('Connection to ROS Bridge closed');
     });
-    
+
 
     return () => {
       ros.close();
@@ -185,37 +214,38 @@ function Map() {
 
   function subscribe() {
     const GPS_topic_listner = new ROSLIB.Topic({
-        ros: ros,
-        name: "/gps",
-        messageType: "morai_msgs/GPSMessage"
+      ros: ros,
+      name: "/gps",
+      messageType: "morai_msgs/GPSMessage"
     });
 
-    GPS_topic_listner.subscribe(function(data){
+    GPS_topic_listner.subscribe(function (data) {
       // 위도와 경도 값을 상태로 설정
       setPosition([data.latitude, data.longitude]);
-  
+
       // 목적지 위도, 경도
-      const targetLatitude = 37.245428193272716;
-      const targetLongitude = 126.7750329522217;
-  
+      const targetLatitude = clickedPosition ? clickedPosition.lat : null;
+      const targetLongitude = clickedPosition ? clickedPosition.lng : null;
+
       // 범위 설정
       const range = 0.0001;
-  
+
       // 위도와 경도가 목적지의 범위 안에 있는지 확인
       if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
-          (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
-          console.log("목적지에 도착했습니다.");
+        (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
+        console.log("목적지에 도착했습니다.");
+        // usestate + modal() 이런 함수 띄워서 도착 표시하기 
       } else {
-          console.log(data.latitude);
-          console.log(data.longitude);
+        // console.log(data.latitude);
+        // console.log(data.longitude);
       }
-  });
-  
-}
+    });
+
+  }
 
 
-  function utmTogps(east,north){
-    let coords = proj4(utmProjection, wgs84Projection, [east,north]);
+  function utmTogps(east, north) {
+    let coords = proj4(utmProjection, wgs84Projection, [east, north]);
     return {
       latitude: coords[1],
       longitude: coords[0]
@@ -224,43 +254,43 @@ function Map() {
 
   function subscribe2() {
     const GPS_topic_listner = new ROSLIB.Topic({
-        ros: ros,
-        name: "/global_path",
-        messageType: "nav_msgs/Path"
+      ros: ros,
+      name: "/global_path",
+      messageType: "nav_msgs/Path"
     });
-    
 
 
-    GPS_topic_listner.subscribe(function(data){
 
-        // 배열 초기화
-        let locations = [];
+    GPS_topic_listner.subscribe(function (data) {
 
-        // for문 돌려서 경로 재탐색
-        for(let i = 0; i < data.poses.length; i++) {
-            let east = data.poses[i].pose.position.x + 302459.942;
-            let north = data.poses[i].pose.position.y + 4122635.537;
-            
-            // console.log(east, north);
+      // 배열 초기화
+      let locations = [];
 
-            let result = utmTogps(east, north);
-            // console.log(result.latitude, result.longitude);
-            
-            // 결과를 locations 배열에 추가
-            locations.push([
-                result.longitude,
-                result.latitude
-            ]);
-        }
-        console.log(locations);  // 전체 위치 데이터를 출력
-        localStorage.setItem('locations', JSON.stringify(locations));
+      // for문 돌려서 경로 재탐색
+      for (let i = 0; i < data.poses.length; i++) {
+        let east = data.poses[i].pose.position.x + 302459.942;
+        let north = data.poses[i].pose.position.y + 4122635.537;
 
-        // 메시지를 받은 후 즉시 구독 취소
-        GPS_topic_listner.unsubscribe();
+        // console.log(east, north);
+
+        let result = utmTogps(east, north);
+        // console.log(result.latitude, result.longitude);
+
+        // 결과를 locations 배열에 추가
+        locations.push([
+          result.longitude,
+          result.latitude
+        ]);
+      }
+      // console.log(locations);  // 전체 위치 데이터를 출력
+      localStorage.setItem('locations', JSON.stringify(locations));
+
+      // 메시지를 받은 후 즉시 구독 취소
+      GPS_topic_listner.unsubscribe();
     });
-    
-    console.log('제잘');
-}
+
+
+  }
 
 
   const RenderMarkers = () => {
@@ -272,7 +302,7 @@ function Map() {
     return markers.map((marker, index) => (
       <Marker key={index} position={marker.position} icon={marker.icon}>
         <Popup>
-        
+
           <div className={styles.centerContent}>
             <b>{marker.label}</b>
           </div>
@@ -294,24 +324,6 @@ function Map() {
       </Marker>
     ));
   };
-
-  // const MAPREAD = () => {
-  //   this.ros = new ROSLIB.Ros({ url: 'ws://localhost:9090' });
-  //   this.ros.on('connection', (connection) => console.log('connection'));
-  //   this.ros.on('error', (connection) => console.log('에러'));
-  //   this.ros.on('close', (connection) => console.log('닫기'));
-
-  //   let global_path_listener = new ROSLIB.Topic({
-  //     ros: this.ros,
-  //     name: '/global_path',
-  //     messageType: 'nav_msgs/Path'
-  //   });
-
-  //   global_path_listener.subscribe(data => {
-  //     console.log(data.poses[0].pose.position.x)
-  //   });
-  // };
-
   const MapEvents = () => {
     useMapEvents({
       click: (e) => {
@@ -327,27 +339,29 @@ function Map() {
       const token = localStorage.getItem('token');
       const postData = {
         // reservation: true,
-        lat: clickedLatitude, // use the saved latitude from state
-        lng: clickedLongitude, // use the saved longitude from state
+        lat: clickedLatitude, 
+        lng: clickedLongitude,
         vehicle_id: vehicleId
       };
-  
+
       const response = await axios.post(
         `${url}/reservation/now`,
         postData,
         { headers: { 'authorization': token } }
       );
-  
+
       if (response.status === 200) {
         console.log("Vehicle reserved successfully!");
         setIsRented(true); // 예약이 성공하면 isRented를 true로 설정
         setModalContent('reserve'); // Modal content를 예약으로 설정
         closeModal();
-  
-        // reserveVehicle가 실행될 때마다 subscribe와 subscribe2를 호출
-        // subscribe3();
+        console.log(response.data)
+        setReservationId(response.data.insertId); 
+
+        // reserveVehicle가 실행될 때마다 subscribe3와 subscribe4를 호출
+        subscribe3();
         subscribe4();
-  
+
       } else {
         console.error("Failed to reserve the vehicle");
       }
@@ -355,70 +369,69 @@ function Map() {
       console.error('Error:', error);
     }
   };
-  
+
   function subscribe3() {
-      const GPS_topic_listner = new ROSLIB.Topic({
-          ros: ros,
-          name: "/gps",
-          messageType: "morai_msgs/GPSMessage"
-      });
-  
-      GPS_topic_listner.subscribe(function(data){
-        // 위도와 경도 값을 상태로 설정
-        setPosition([data.latitude, data.longitude]);
-    
-        // 목적지 위도, 경도
-        const targetLatitude = 37.245428193272716;
-        const targetLongitude = 126.7750329522217;
-    
-        // 범위 설정
-        const range = 0.0001;
-    
-        // 위도와 경도가 목적지의 범위 안에 있는지 확인
-        if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
-            (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
-            console.log("목적지에 도착했습니다.");
-        } else {
-            console.log(data.latitude);
-            console.log(data.longitude);
-        }
+    const GPS_topic_listner = new ROSLIB.Topic({
+      ros: ros,
+      name: "/gps",
+      messageType: "morai_msgs/GPSMessage"
+    });
+
+    GPS_topic_listner.subscribe(function (data) {
+      // 위도와 경도 값을 상태로 설정
+      setPosition([data.latitude, data.longitude]);
+
+      // 목적지 위도, 경도
+      const targetLatitude = clickedPosition ? clickedPosition.lat : null;
+      const targetLongitude = clickedPosition ? clickedPosition.lng : null;
+      // 범위 설정
+      const range = 0.0001;
+
+      // 위도와 경도가 목적지의 범위 안에 있는지 확인
+      if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
+        (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
+        console.log("목적지에 도착했습니다.");
+      } else {
+        // console.log(data.latitude);
+        // console.log(data.longitude);
+      }
     });
   }
-  
+
   function subscribe4() {
-      const GPS_topic_listner = new ROSLIB.Topic({
-          ros: ros,
-          name: "/global_path",
-          messageType: "nav_msgs/Path"
-      });
-  
-      GPS_topic_listner.subscribe(function(data){
-          // 배열 초기화
-          let locations = [];
-  
-          // for문 돌려서 경로 재탐색
-          for(let i = 0; i < data.poses.length; i++) {
-              let east = data.poses[i].pose.position.x + 302459.942;
-              let north = data.poses[i].pose.position.y + 4122635.537;
-              
-              let result = utmTogps(east, north);
-              
-              // 결과를 locations 배열에 추가
-              locations.push([
-                  result.longitude,
-                  result.latitude
-              ]);
-          }
-          console.log(locations);  // 전체 위치 데이터를 출력
-          localStorage.setItem('locations', JSON.stringify(locations));
-  
-          // 메시지를 받은 후 즉시 구독 취소
-          GPS_topic_listner.unsubscribe();
-      });
-      
-      console.log('제잘');
+    const GPS_topic_listner = new ROSLIB.Topic({
+      ros: ros,
+      name: "/global_path",
+      messageType: "nav_msgs/Path"
+    });
+
+    GPS_topic_listner.subscribe(function (data) {
+      // 배열 초기화
+      let locations = [];
+
+      // for문 돌려서 경로 재탐색
+      for (let i = 0; i < data.poses.length; i++) {
+        let east = data.poses[i].pose.position.x + 302459.942;
+        let north = data.poses[i].pose.position.y + 4122635.537;
+
+        let result = utmTogps(east, north);
+
+        // 결과를 locations 배열에 추가
+        locations.push([
+          result.longitude,
+          result.latitude
+        ]);
+      }
+      console.log(locations);  // 전체 위치 데이터를 출력
+      localStorage.setItem('locations', JSON.stringify(locations));
+
+      // 메시지를 받은 후 즉시 구독 취소
+      GPS_topic_listner.unsubscribe();
+    });
+
+    // console.log('제잘');
   }
-  
+
 
 
 
@@ -435,7 +448,7 @@ function Map() {
     <div>
       <button onClick={() => subscribe()}>차 실시간 위치 확인하기</button>
       <button onClick={() => subscribe2()}>경로 탐색</button>
-      
+
       <div className={styles.row}>
         <div className={`${styles.col} ${styles.textCenter}`}>
           <div className={styles.col}>
@@ -453,8 +466,11 @@ function Map() {
               {isRented && (
                 <div className={styles.returnButtonContainer}>
                   <button onClick={returnVehiclePrompt} className={styles.returnButton}>반납하기</button>
+                  <button className={styles.stopButton}>정지하기</button>
+
                 </div>
               )}
+
 
             </MapContainer>
 

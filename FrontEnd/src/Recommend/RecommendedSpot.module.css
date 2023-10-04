@@ -2,7 +2,7 @@
 
 .slideContainer {
     background: linear-gradient(45deg, #9b59b6, #8e44ad);
-    padding: 20px;
+    padding: 10px 20px;
     padding-bottom: 10px;
     text-align: center;
     color: white;
@@ -10,6 +10,8 @@
     margin-top: 20px;
     border-radius: 10px; /* 모서리 부드럽게 처리 */
     margin: 0 10px;
+    margin-bottom: 50px;
+    font-family: 'Jua', sans-serif;
   }
   
   .slideImage {
@@ -30,4 +32,11 @@
     width: calc(50% - 10px); 
     margin: 5px;
   }
+
+
+  @font-face {
+    font-family: 'Jua';
+    src: url('../../public/fonts/Jua/Jua-Regular.ttf') format('truetype');  
+  }
+
   

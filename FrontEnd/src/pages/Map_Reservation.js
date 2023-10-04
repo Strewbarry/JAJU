@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styles from './Map.module.css';
+import styles from './Map_Reservation.module.css';
+
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON, useMap } from 'react-leaflet';
 import osm from "../osm-providers";
 import osm2 from "../osm-providers2";
@@ -115,7 +116,8 @@ const RenderMarkers = () => {
     <Marker key={index} position={marker.position} icon={marker.icon}>
       <Popup>
         <b>{marker.label}</b>
-        <button onClick={() => handleButtonClick(marker.position[0], marker.position[1])}>
+        <br/>
+        <button className={styles.callButton} onClick={() => handleButtonClick(marker.position[0], marker.position[1])}>
           이곳으로 호출하기
         </button>
       </Popup>

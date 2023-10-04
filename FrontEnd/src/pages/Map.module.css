@@ -145,3 +145,23 @@
 .cancelButton:hover {
   background-color: #d32f2f;
 }
+
+/* 출발하기 버튼에 대한 스타일 */
+.startButton {
+  padding: 10px 20px;
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+
+/* 정지하기 버튼에 대한 스타일 */
+.stopButton {
+  padding: 10px 20px; /* 버튼의 크기 조절을 위한 패딩 */
+  background-color: red; /* 예: 버튼의 배경색 */
+  color: white; /* 예: 버튼의 텍스트 색 */
+  border: none; /* 버튼 테두리 제거 */
+  cursor: pointer; /* 마우스를 올렸을 때 손가락 커서 표시 */
+}
+

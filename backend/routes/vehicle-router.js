@@ -15,4 +15,6 @@ router.post('/stop', verifyToken, vehicleLogic.stop)
 // 지금 즉시 예약 가능한 차량이 있다면 정보 불러오기
 router.post('/rightnow', verifyToken, vehicleLogic.rightnow)
 
+// 차량 호출하기
+router.post('/call', verifyToken, vehicleLogic.call)
 module.exports = router;

@@ -16,5 +16,5 @@ router.post('/stop', verifyToken, vehicleLogic.stop)
 router.post('/rightnow', verifyToken, vehicleLogic.rightnow)
 
 // 차량 호출하기
-router.post('/call', verifyToken, vehicleLogic.call)
+router.get('/call', verifyToken, vehicleLogic.call)
 module.exports = router;

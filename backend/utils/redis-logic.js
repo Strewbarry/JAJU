@@ -23,11 +23,13 @@ async function setValue (a, select) {
     else if (select === 0) {
       // redis status 를 stop으로 변경
         await redis.set('status', 'stop')
+        console.log('값이 설정되었습니다.');
     }
     // 이후 나머지는 호출지로 호출하는 신호이다.
     else {
       // redis status 를 call로 변경
       await redis.set('status', 'call')
+      console.log('값이 설정되었습니다.');
     }
   } catch (error) {
     console.error('오류 발생:', error);

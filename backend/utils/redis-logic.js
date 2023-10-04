@@ -13,10 +13,10 @@ async function setValue (a, select) {
   try {
     // select가 1이라면 목적지로 출발하라는 신호이니
     if ( select === 1) {
+      // cmd 값을 목적지 id값으로 변경
+      await redis.set('cmd', a);
       // redis status 값을 start로 변경
         await redis.set('status', 'start')
-      // cmd 값을 목적지 id값으로 변경
-        await redis.set('cmd', a);
         console.log('값이 설정되었습니다.');
     }
     // 0이라면 정지 신호이니

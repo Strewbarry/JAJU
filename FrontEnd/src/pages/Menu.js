@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Menu.module.css'; 
 import axios from 'axios'; // axios를 import합니다.
-
+import {Url} from '../server_url';
 
 function Menu() {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
   const [name, setName] = useState(null); // 이름을 저장할 상태 변수를 추가합니다.
   const [id, setId] = useState(null);
-
+  const url = Url
   const [isModalOpen, setIsModalOpen] = useState(false); // modal창
   const openModal = () => {
     setIsModalOpen(true);
@@ -41,7 +41,7 @@ function Menu() {
   };
   const confirmDeleteAccount = async () => {
     try {
-      const response = await axios.delete('http://192.168.100.38:3000/user/delete', {
+      const response = await axios.delete(`${url}/user/delete`, {
         headers: {
           'authorization': localStorage.getItem('token')
         }

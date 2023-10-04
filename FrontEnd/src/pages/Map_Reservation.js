@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styles from './Map.module.css';
+import styles from './Map_Reservation.module.css';
+
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, GeoJSON, useMap } from 'react-leaflet';
 import osm from "../osm-providers";
 import osm2 from "../osm-providers2";
@@ -26,6 +27,7 @@ const ZOOM_LEVEL = 16;
 const createIcon = (iconUrl) => new L.Icon({
   iconUrl,
   iconSize: [45, 45],
+  className: 'leaflet-circle-icon' // CSS 클래스 이름 추가
 });
 
 
@@ -114,7 +116,8 @@ const RenderMarkers = () => {
     <Marker key={index} position={marker.position} icon={marker.icon}>
       <Popup>
         <b>{marker.label}</b>
-        <button onClick={() => handleButtonClick(marker.position[0], marker.position[1])}>
+        <br/>
+        <button className={styles.callButton} onClick={() => handleButtonClick(marker.position[0], marker.position[1])}>
           이곳으로 호출하기
         </button>
       </Popup>
@@ -189,13 +192,7 @@ function Map() {
               <GeoJSON data={lineStringData} />
             </MapContainer>
           </div>
-          {clickedPosition && (
-            <div className={styles.clickedPositionInfo}>
-              클릭된 위치: <br />
-              위도: {clickedPosition.lat} <br />
-              경도: {clickedPosition.lng}
-            </div>
-          )}
+
         </div>
       </div>
     </div>

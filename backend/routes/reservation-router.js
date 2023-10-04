@@ -7,7 +7,10 @@ const { verifyToken } = require('../utils/tokenverify');
 router.post('/make', verifyToken, reservationLogic.make)
 // 예약 취소하기
 router.delete('/delete/:id', verifyToken, reservationLogic.delete)
-
+// 바로 호출 차량 예약하기
+router.post('/now', verifyToken, reservationLogic.now)
+// 차량 반납하기
+router.put('/return', verifyToken, reservationLogic.return)
 
 
 

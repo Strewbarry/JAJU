@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styles from './Reservation.module.css';
 import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
+import {Url} from '../server_url';
+
 
 const Reservation = () => {
+  const url = Url
   const [region, setRegion] = useState('');
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('');
@@ -41,6 +44,9 @@ const Reservation = () => {
   useEffect(() => {
     checkValidTime();
   }, [bookingTime, returnTime]);
+
+
+    
 
     // 예약 날짜 및 시간 변경 핸들러
     const handleBookingDateChange = (e) => {
@@ -88,7 +94,7 @@ const Reservation = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await axios.post('http://192.168.100.38:3000/vehicle/find', {
+      const response = await axios.post(`${url}/vehicle/find`, {
         around_location: region,
         start_time: `${bookingDate}T${bookingTime}:${bookingMinutes}:00Z`,
         end_time: `${returnDate}T${returnTime}:${returnMinutes}:00Z`
@@ -122,7 +128,7 @@ const Reservation = () => {
     try {
       const token = localStorage.getItem('token');
   
-      const response = await axios.post('http://192.168.100.38:3000/vehicle/find', {
+      const response = await axios.post(`${url}/vehicle/find`, {
         around_location: region,
         start_time: `${bookingDate}T${bookingTime}:${bookingMinutes}:00Z`,
         end_time: `${returnDate}T${returnTime}:${returnMinutes}:00Z`
@@ -222,15 +228,15 @@ return (
       </div>
       <div className={styles.field}>
         <button onClick={checkInputAndNavigate} className={styles.viewCarsButton}>이용 가능 차량 보기</button>
-        <div className={styles.field}>
+        {/* <div className={styles.field}>
           <button onClick={handleFindVehicle} className={styles.findVehicleButton}>콘솔로 찍어보기</button>
-        </div>
+        </div> */}
       </div>
       {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <span className={styles.closeButton} onClick={() => setShowModal(false)}>X</span>
-            이용할 수 있는 차량이 없습니다.
+            이용 가능한 차량이 없습니다.
           </div>
         </div>
       )}

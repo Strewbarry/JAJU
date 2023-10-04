@@ -24,16 +24,23 @@ import Yangyang from './Recommend/Yangyang';
 import Seoul from './Recommend/Seoul';
 import Busan from './Recommend/Busan';
 
-
 function MainPage() {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);  // 로딩 상태 추가
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
+
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
     
   }, []);
+  if (isLoading) {
+    return <div class="loading">Loading&#8230;</div>  // 로딩 중일 때의 화면
+  }
 
 
   const goToMap = () => {

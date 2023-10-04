@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import styles from './Signup.module.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {Url} from '../server_url';
 
 function Signup() {
+  const url = Url
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ function Signup() {
     }
     
     try {
-      const response = await axios.post('http://192.168.100.38:3000/user/idcheck', { email });
+      const response = await axios.post(`${url}/user/idcheck`, { email });
       if (response.status === 205) {
         setMessage('이미 존재하는 이메일입니다.');
         setIsIdAvailable(false);
@@ -47,7 +49,7 @@ function Signup() {
     };
 
     try {
-      const response = await axios.post('http://192.168.100.38:3000/user/signup', userData);
+      const response = await axios.post(`${url}/user/signup`, userData);
       
       if (response.status === 200) {
         alert('회원가입이 완료되었습니다');

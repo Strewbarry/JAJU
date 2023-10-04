@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import {Url} from '../server_url';
 
 function Changeinfo() {
   const [name, setName] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
   const [message, setMessage] = useState('');
+  const url = Url
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +27,9 @@ function Changeinfo() {
     }
 
     try {
-      const response = await axios.put('http://192.168.100.38:3000/user/update', userData, {
+
+    
+      const response = await axios.put(`${url}/user/update`, userData, {
         headers: {
           authorization: token // 인증 헤더 추가
         },

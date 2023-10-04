@@ -187,6 +187,7 @@ exports.move = async (req, res) => {
     // 해당 차량의 목적지를 해당 목적지의 노드 번호로 바꾸기
     const sql = 'UPDATE `vehicle` SET `destination` = ? WHERE (`id` = ?);'
     const params = [destination[0].node_number , vehicle_id]
+    console.log(params)
 
     connection.query(sql, params, function (error, results, fields) {
         if (error) reject(error);
@@ -220,7 +221,14 @@ exports.stop = async (req, res) => {
 
 
 exports.call = async (req, res) => {
-    // 해당 차량 호출지로 호출하는 신호 보내기
-    setValue(0,2)
-    res.status(200).json('호출 시작')
+    try {
+
+        // 해당 차량 호출지로 호출하는 신호 보내기
+        console.log('call 요청 성공')
+        setValue(0,2)
+        res.status(200).json('호출 시작')
+    }
+    catch(error) {
+        console.log(error)
+    }
 }

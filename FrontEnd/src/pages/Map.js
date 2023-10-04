@@ -298,9 +298,19 @@ function Map() {
 
 
   const RenderMarkers = () => {
-    const handleSelectDestination = (marker) => {
+    const token =  localStorage.getItem('token');
+    const handleSelectDestination = async (marker) => {
       console.log(marker.label);
-
+      if (marker.label === '호출지') {
+        console.log(token)
+        const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
+        console.log(response)
+      }
+      else if (marker.label === '마라탕집') {
+        const postdata = {vehicle_id:vehicleId, destination_name : 'school'}
+        const response = await axios.post(`${url}/vehicle/move`,postdata, { headers: { 'authorization': token } });
+        console.log(response)
+      }
       // 여기에서 원하는 작업을 수행할 수 있습니다.
     };
     return markers.map((marker, index) => (
@@ -363,7 +373,7 @@ function Map() {
         setReservationId(response.data.insertId); 
 
         // reserveVehicle가 실행될 때마다 subscribe3와 subscribe4를 호출
-        subscribe3();
+        // subscribe3();
         subscribe4();
 
       } else {
@@ -448,6 +458,15 @@ function Map() {
     }
   };
 
+  async function stop () {
+    console.log('정지')
+    const postdata = {vehicle_id : vehicleId}
+    const token =  await localStorage.getItem('token');
+    const response = await axios.post(`${url}/vehicle/stop`,postdata, { headers: { 'authorization': token } });
+    console.log(response)
+      
+  }
+
   return (
     <div>
       <button onClick={() => subscribe()}>차 실시간 위치 확인하기</button>
@@ -470,7 +489,7 @@ function Map() {
               {isRented && (
                 <div className={styles.returnButtonContainer}>
                   <button onClick={returnVehiclePrompt} className={styles.returnButton}>반납하기</button>
-                  <button className={styles.stopButton}>정지하기</button>
+                  <button onClick={stop} className={styles.stopButton}>정지하기</button>
 
                 </div>
               )}

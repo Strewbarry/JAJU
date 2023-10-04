@@ -9,6 +9,8 @@ router.post('/make', verifyToken, reservationLogic.make)
 router.delete('/delete/:id', verifyToken, reservationLogic.delete)
 // 바로 호출 차량 예약하기
 router.post('/now', verifyToken, reservationLogic.now)
+// 차량 반납하기
+router.put('/return', verifyToken, reservationLogic.return)
 
 
 

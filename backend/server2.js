@@ -38,5 +38,5 @@ function periodicRedisCheck() {
 // 3000번 포트에 관해서 요청 듣고 있기
 app.listen(app.get('port'), () => {
     console.log(app.get('port'), '번 포트에서 대기중')
-    periodicRedisCheck()
+    // periodicRedisCheck()
 })

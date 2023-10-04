@@ -4,6 +4,7 @@
   align-items: center;
   height: 100vh;
   background-color: #f0f0f0;
+  margin-bottom: 60px;
 }
 
 .signupForm {
@@ -36,10 +37,11 @@
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  margin-bottom: 3px;
 }
 
 .signupForm button {
-  width: 100%;
+  width: 87%;
   padding: 10px;
   background-color: #007bff;
   border: none;

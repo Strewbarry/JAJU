@@ -182,6 +182,7 @@ function Map() {
       ros.close();
     };
   }, []);
+
   function subscribe() {
     const GPS_topic_listner = new ROSLIB.Topic({
         ros: ros,
@@ -263,6 +264,11 @@ function Map() {
 
 
   const RenderMarkers = () => {
+    const handleSelectDestination = (marker) => {
+      console.log(marker.label);
+
+      // 여기에서 원하는 작업을 수행할 수 있습니다.
+    };
     return markers.map((marker, index) => (
       <Marker key={index} position={marker.position} icon={marker.icon}>
         <Popup>
@@ -272,11 +278,13 @@ function Map() {
           </div>
           <br />
           {isRented ?
-            <button onClick={returnVehicle} className={styles.destinationButton}>목적지로 선택</button>
+            <button onClick={() => {handleSelectDestination(marker)}} className={styles.destinationButton}>목적지로 선택</button>
             :
             <button
               className={styles.callVehicleButton}
-              onClick={() => callVehicle(marker.position[0], marker.position[1])}>
+              onClick={() => callVehicle(marker.position[0], marker.position[1])
+                  
+              }>
               이곳으로 호출하기
             </button>
           }
@@ -337,7 +345,7 @@ function Map() {
         closeModal();
   
         // reserveVehicle가 실행될 때마다 subscribe와 subscribe2를 호출
-        subscribe3();
+        // subscribe3();
         subscribe4();
   
       } else {

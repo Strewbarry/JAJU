@@ -14,13 +14,13 @@ function ROS() {
   let result = 0;
 
   let ros = new ROSLIB.Ros({
-    url: 'ws://13.124.128.202:9090', // ROS Bridge WebSocket URL
+    url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
   });
   
   useEffect(() => {
 
     ros = new ROSLIB.Ros({
-    url: 'ws://13.124.128.202:9090', // ROS Bridge WebSocket URL
+    url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
   });
 
     ros.on('connection', () => {

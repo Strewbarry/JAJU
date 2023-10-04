@@ -18,7 +18,7 @@ import beerImage from '../assets/beer.png';
 import childrenImage from '../assets/children.png';
 import airportImage from '../assets/Airport.png';
 import barrierImage from '../assets/barrier.png';
-
+import CircleImage from '../assets/Circle.png'
 
 import ROSLIB from 'roslib';
 import proj4 from 'proj4';
@@ -47,7 +47,7 @@ const beerIcon = createIcon(beerImage);
 const childrenIcon = createIcon(childrenImage)
 const barrierIcon = createIcon(barrierImage)
 const airportIcon = createIcon2(airportImage)
-
+const CircleIcon = createIcon2(CircleImage)
 const markers = [
   { position: [37.245428193272716, 126.7750329522217], icon: hotelIcon, label: '스탠포드호텔' },
   // { position: [37.23918867370749, 126.77313034628662], icon: airportIcon, label: 'Start 지점[제주공항]' },
@@ -55,9 +55,13 @@ const markers = [
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
   { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '술집' },
-  { position: [37.239984102516516, 126.77420129836432], icon: childrenIcon, label: '어린이보호구역' }, // 학교
+  // { position: [37.239984102516516, 126.77420129836432], icon: childrenIcon, label: '어린이보호구역' }, // 학교
   { position: [37.24329834268778, 126.77522987905812], icon: barrierIcon, label: '공사중 막혀서 돌아감' }, //
   { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
+  { position: [37.23854529782744, 126.77299597702779], icon: defaultIcon, label: '주차장' }, //  
+  { position: [37.239071349649535, 126.77305532061546  ], icon: defaultIcon, label: '호출지' }, //
+  { position: [37.24000507292737, 126.77429711745246  ], icon: beerIcon, label: '마라탕집' }, //
+  { position: [37.2430196110599, 126.77451974507942  ], icon: defaultIcon, label: '탕후루집' }, //
 
 ];
 
@@ -77,7 +81,7 @@ function Map() {
 
   const [vehicleId, setVehicleId] = useState(null); // to store vehicle id
 
-  const [position, setPosition] = useState([37.23918867370749, 126.77313034628662]);
+  const [position, setPosition] = useState([0, 126.77313034628662]);
 
   const utmProjection = "+proj=utm +zone=52";
   const wgs84Projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
@@ -85,7 +89,7 @@ function Map() {
   let north = 0;
   let result = 0;
   let ros = new ROSLIB.Ros({
-    url: 'ws://13.124.128.202:9090', // ROS Bridge WebSocket URL
+    url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
   });
 
   let storedLocations = localStorage.getItem('locations');
@@ -157,7 +161,7 @@ function Map() {
   useEffect(() => {
 
     ros = new ROSLIB.Ros({
-    url: 'ws://13.124.128.202:9090', // ROS Bridge WebSocket URL
+    url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
   });
 
     ros.on('connection', () => {
@@ -186,9 +190,26 @@ function Map() {
     });
 
     GPS_topic_listner.subscribe(function(data){
-        // 위도와 경도 값을 상태로 설정
-        setPosition([data.latitude, data.longitude]);
-    });
+      // 위도와 경도 값을 상태로 설정
+      setPosition([data.latitude, data.longitude]);
+  
+      // 목적지 위도, 경도
+      const targetLatitude = 37.245428193272716;
+      const targetLongitude = 126.7750329522217;
+  
+      // 범위 설정
+      const range = 0.0001;
+  
+      // 위도와 경도가 목적지의 범위 안에 있는지 확인
+      if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
+          (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
+          console.log("목적지에 도착했습니다.");
+      } else {
+          console.log(data.latitude);
+          console.log(data.longitude);
+      }
+  });
+  
 }
 
 
@@ -302,18 +323,23 @@ function Map() {
         lng: clickedLongitude, // use the saved longitude from state
         vehicle_id: vehicleId
       };
-
+  
       const response = await axios.post(
         `${url}/reservation/now`,
         postData,
         { headers: { 'authorization': token } }
       );
-
+  
       if (response.status === 200) {
         console.log("Vehicle reserved successfully!");
         setIsRented(true); // 예약이 성공하면 isRented를 true로 설정
         setModalContent('reserve'); // Modal content를 예약으로 설정
         closeModal();
+  
+        // reserveVehicle가 실행될 때마다 subscribe와 subscribe2를 호출
+        subscribe3();
+        subscribe4();
+  
       } else {
         console.error("Failed to reserve the vehicle");
       }
@@ -321,6 +347,70 @@ function Map() {
       console.error('Error:', error);
     }
   };
+  
+  function subscribe3() {
+      const GPS_topic_listner = new ROSLIB.Topic({
+          ros: ros,
+          name: "/gps",
+          messageType: "morai_msgs/GPSMessage"
+      });
+  
+      GPS_topic_listner.subscribe(function(data){
+        // 위도와 경도 값을 상태로 설정
+        setPosition([data.latitude, data.longitude]);
+    
+        // 목적지 위도, 경도
+        const targetLatitude = 37.245428193272716;
+        const targetLongitude = 126.7750329522217;
+    
+        // 범위 설정
+        const range = 0.0001;
+    
+        // 위도와 경도가 목적지의 범위 안에 있는지 확인
+        if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
+            (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
+            console.log("목적지에 도착했습니다.");
+        } else {
+            console.log(data.latitude);
+            console.log(data.longitude);
+        }
+    });
+  }
+  
+  function subscribe4() {
+      const GPS_topic_listner = new ROSLIB.Topic({
+          ros: ros,
+          name: "/global_path",
+          messageType: "nav_msgs/Path"
+      });
+  
+      GPS_topic_listner.subscribe(function(data){
+          // 배열 초기화
+          let locations = [];
+  
+          // for문 돌려서 경로 재탐색
+          for(let i = 0; i < data.poses.length; i++) {
+              let east = data.poses[i].pose.position.x + 302459.942;
+              let north = data.poses[i].pose.position.y + 4122635.537;
+              
+              let result = utmTogps(east, north);
+              
+              // 결과를 locations 배열에 추가
+              locations.push([
+                  result.longitude,
+                  result.latitude
+              ]);
+          }
+          console.log(locations);  // 전체 위치 데이터를 출력
+          localStorage.setItem('locations', JSON.stringify(locations));
+  
+          // 메시지를 받은 후 즉시 구독 취소
+          GPS_topic_listner.unsubscribe();
+      });
+      
+      console.log('제잘');
+  }
+  
 
 
 
@@ -348,7 +438,7 @@ function Map() {
               </div>
               <TileLayer url={mapType === 'normal' ? osm.maptiler.url : osm2.maptiler.url} attribution={mapType === 'normal' ? osm.maptiler.attribution : osm2.maptiler.attribution} />
               <MapEvents />
-              <Marker position={position} icon={airportIcon} label='Start 지점[제주공항]' />
+              <Marker position={position} icon={CircleIcon} label='Start 지점[제주공항]' />
 
               <RenderMarkers />
               <GeoJSON data={lineStringData} />

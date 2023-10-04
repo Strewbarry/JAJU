@@ -20,6 +20,8 @@ import airportImage from '../assets/Airport.png';
 import barrierImage from '../assets/barrier.png';
 import tanghuluImage from '../assets/tanghulu.png';
 import CircleImage from '../assets/Circle.png'
+import maraImage from '../assets/mara.png'
+import parkingImage from '../assets/parking.png'
 
 import ROSLIB from 'roslib';
 import proj4 from 'proj4';
@@ -50,19 +52,21 @@ const barrierIcon = createIcon(barrierImage)
 const airportIcon = createIcon2(airportImage)
 const CircleIcon = createIcon(CircleImage)
 const tanghuluIcon = createIcon(tanghuluImage)
+const maraIcon = createIcon(maraImage)
+const parkingIcon = createIcon(parkingImage)
 const markers = [
   { position: [37.245428193272716, 126.7750329522217], icon: hotelIcon, label: '스탠포드호텔' },
 
   { position: [37.24068299201391, 126.77130810123954], icon: restaurantIcon, label: '한국식 소고기 전문 음식점 [ 배꼽집]' },
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
-  { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '술집' },
+  { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '한잔어때' },
 
   { position: [37.24329834268778, 126.77522987905812], icon: barrierIcon, label: '공사중 막혀서 돌아감' }, //
   // { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
-  { position: [37.23854529782744, 126.77299597702779], icon: defaultIcon, label: '주차장' }, //  
+  { position: [37.23854529782744, 126.77299597702779], icon: parkingIcon, label: '주차장' }, //  
   { position: [37.239071349649535, 126.77305532061546], icon: defaultIcon, label: '호출지' }, //
-  { position: [37.24000507292737, 126.77429711745246], icon: beerIcon, label: '마라탕집' }, //
+  { position: [37.24000507292737, 126.77429711745246], icon: maraIcon, label: '마라탕집' }, //
   { position: [37.2430196110599, 126.77451974507942], icon: tanghuluIcon, label: '탕후루집' }, //
 
 ];

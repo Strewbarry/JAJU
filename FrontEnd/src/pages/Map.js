@@ -21,7 +21,6 @@ import barrierImage from '../assets/barrier.png';
 import tanghuluImage from '../assets/tanghulu.png';
 import CircleImage from '../assets/Circle.png'
 
-
 import ROSLIB from 'roslib';
 import proj4 from 'proj4';
 

@@ -45,7 +45,7 @@ function Event() {
                 <button 
                     className={currentEvent === 'ended' ? styles.activeButton : ''} 
                     onClick={() => setCurrentEvent('ended')}>
-                    종료된 이벤트
+                    종료된 이벤트x
                 </button>
             </div>
             {renderEventList()}

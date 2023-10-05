@@ -28,6 +28,7 @@ function CheckReservation() {
     const [selectedLongitude, setSelectedLongitude] = useState('');
     const selectedCarFee = localStorage.getItem('selectedCarFee');
     const storedRegion = localStorage.getItem('selectedRegion');
+    const [selectedLocation, setSelectedLocation] = useState('');
 
     const navigate = useNavigate();
 
@@ -37,6 +38,7 @@ function CheckReservation() {
         setSelectedCar(localStorage.getItem('selectedCarId') || '');
         setSelectedLatitude(localStorage.getItem('selectedLatitude') || '');
         setSelectedLongitude(localStorage.getItem('selectedLongitude') || '');
+        setSelectedLocation(localStorage.getItem('selectedLocation') || '');
     }, []);
     
     const [isModalOpen, setModalOpen] = useState(false);
@@ -57,6 +59,7 @@ function CheckReservation() {
                 lng: selectedLongitude,
                 price: selectedCarFee,
                 region: storedRegion,
+                location : selectedLocation,
             }, {
                 headers: { 'authorization': token }
             });
@@ -85,6 +88,7 @@ function CheckReservation() {
                 <p>선택한 차량: {selectedCarId}</p>
                 <p>호출할 지역: 위도 {selectedLatitude}, 경도 {selectedLongitude}</p>
                 <p>예상 가격: {selectedCarFee}원</p>
+                <p>호출 위치: {selectedLocation}</p>
             </div>
             <button onClick={handleReservationConfirmation} className={styles.confirmButton}>
                 예약 확정

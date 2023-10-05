@@ -13,6 +13,9 @@ import BusanImage9 from '../assets/Busan9.png';
 import BusanImage10 from '../assets/Busan10.png';
 
 function Busan() {
+  const handleGoBack = () => {
+    navigate("/");
+  };
   const dummyData = [
     { id: 1, title: "해운대", image: BusanImage },
     { id: 2, title: "부산 타워", image: BusanImage3 },
@@ -28,20 +31,23 @@ function Busan() {
   ];
   const navigate = useNavigate();
 
+  
   return (
-    <div style={{ marginBottom: '70px' }}>
-      <p>부산</p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+    <div className={styles.pageContainer}>
+      <p className={styles.goback} onClick={handleGoBack}>뒤로가기</p>
+      <p className={styles.pageTitle}>부산</p>
+      <div className={styles.itemList}>
         {dummyData.map(item => (
-          <div key={item.id} style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', width: '150px' }}>
-            <img src={item.image} alt={item.title} style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
-            <p style={{ textAlign: 'center', margin: '10px 0 0 0' }}>{item.title}</p>
+          <div key={item.id} className={styles.item}>
+            <img src={item.image} alt={item.title} className={styles.itemImage} />
+            <p className={styles.itemTitle}>{item.title}</p>
           </div>
         ))}
       </div>
       <button className={styles.reservationButton} onClick={() => navigate('/reservation')}>예약 페이지로 이동</button>
     </div>
   );
+  
 }
 
 export default Busan;

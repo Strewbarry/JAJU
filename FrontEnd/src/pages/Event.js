@@ -1,6 +1,9 @@
 
+
+
 import styles from './Event.module.css';  
 import { useState } from 'react';
+
 
 function Event() {
     const [currentEvent, setCurrentEvent] = useState('ongoing'); // 기본값은 '진행중인 이벤트'

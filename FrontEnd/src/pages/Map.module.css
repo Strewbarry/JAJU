@@ -45,7 +45,7 @@
 
 .returnButtonContainer {
   position: absolute;
-  top: 40px;
+  bottom: 40px;
   right: 10px;
   z-index: 999; 
 }
@@ -78,7 +78,6 @@
   cursor: pointer;          /* 마우스 오버 시 손가락 모양으로 변경 */
   transition: background-color 0.3s; /* 배경색 변경 트랜지션 */
 }
-
 
 
 .callVehicleButton {
@@ -163,6 +162,7 @@
   color: white; /* 예: 버튼의 텍스트 색 */
   border: none; /* 버튼 테두리 제거 */
   cursor: pointer; /* 마우스를 올렸을 때 손가락 커서 표시 */
+  border-radius: 5px; 
 }
 
 .dropdown {

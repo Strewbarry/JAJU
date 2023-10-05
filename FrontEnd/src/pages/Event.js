@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
-import ReactDOM from 'react-dom';
+
+
+
 import styles from './Event.module.css';  
+import { useState } from 'react';
 
 
 function Event() {

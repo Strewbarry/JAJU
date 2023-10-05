@@ -78,6 +78,8 @@ function Map() {
   const [clickedLongitude, setClickedLongitude] = useState(null);
   const [mapType, setMapType] = useState('normal');
   const [modalContent, setModalContent] = useState('reserve');
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
 
   const [showModal, setShowModal] = useState(false);
@@ -116,7 +118,7 @@ function Map() {
     try {
       setClickedLatitude(lat); // set latitude here
       setClickedLongitude(lng); // set longitude here
-
+      
       const token = localStorage.getItem('token');
       const around_location = '제주';
       const postData = { around_location, lat, lng };
@@ -373,7 +375,7 @@ function Map() {
         setReservationId(response.data.insertId); 
 
         // reserveVehicle가 실행될 때마다 subscribe3와 subscribe4를 호출
-        // subscribe3();
+        subscribe3();
         subscribe4();
 
       } else {
@@ -446,9 +448,27 @@ function Map() {
     // console.log('제잘');
   }
 
+  const handleOptionSelect = async (option) => {
+    setSelectedOption(option);
+    const token = localStorage.getItem('token');
 
+    if (option === '호출지') {
+        console.log(token);
+        const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
+        console.log(response);
+    } else if (option === '마라탕집') {
+        const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
+        const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+        console.log(response);
+    }
+    // 여기에서 원하는 작업을 수행할 수 있습니다.
+};
 
-
+  const toggleDropdown = () => {
+    setDropdownOpen(!isDropdownOpen);
+  };
+  
+  
   const lineStringData = {
     type: "Feature",
     properties: {},
@@ -479,6 +499,21 @@ function Map() {
               <div className={styles.mapButtons}>
                 <button className={`${styles.button} ${mapType === 'normal' ? styles.buttonSelected : ''}`} onClick={() => setMapType('normal')}>일반지도</button>
                 <button className={`${styles.button} ${mapType === 'satellite' ? styles.buttonSelected : ''}`} onClick={() => setMapType('satellite')}>위성지도</button>
+                <div className={styles.dropdown}>
+                <button className={styles.destinationButton} onClick={toggleDropdown}>
+                  목적지 선택하기
+                </button>
+                {isDropdownOpen && (
+                  <div className={styles.dropdownMenu}>
+                    <button onClick={() => handleOptionSelect('호출지')}>호출지</button>
+                    <button onClick={() => handleOptionSelect('마라탕집')}>마라탕집</button>
+                    <button onClick={() => handleOptionSelect('탕후루집')}>탕후루집</button>
+                    <button onClick={() => handleOptionSelect('한잔어때')}>한잔어때</button>
+                    <button onClick={() => handleOptionSelect('배꼽집')}>배꼽집</button>
+                    <button onClick={() => handleOptionSelect('커피빈')}>커피빈</button>
+                  </div>
+                )}
+              </div>
               </div>
               <TileLayer url={mapType === 'normal' ? osm.maptiler.url : osm2.maptiler.url} attribution={mapType === 'normal' ? osm.maptiler.attribution : osm2.maptiler.attribution} />
               <MapEvents />
@@ -496,6 +531,8 @@ function Map() {
 
 
             </MapContainer>
+
+
 
           </div>
         </div>

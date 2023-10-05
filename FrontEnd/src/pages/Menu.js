@@ -61,24 +61,24 @@ function Menu() {
 
   const goToLogin = () => {
     navigate('/login');
-    window.location.reload()
+  
   };
 
   const goToSignup = () => {
     navigate('/signup');
-    window.location.reload()
+  
   };
 
   const goToChangeinfo = () => {
     navigate('/changeinfo');
-    window.location.reload()
+
   };
 
 
 
   const goToSeeReservation = () => {
     navigate('/seereservation');
-    window.location.reload()
+   
   };
 
 

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Menu.module.css'; 
-import axios from 'axios'; // axios를 import합니다.
+import axios from 'axios'; 
 import {Url} from '../server_url';
+
 
 function Menu() {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
-  const [name, setName] = useState(null); // 이름을 저장할 상태 변수를 추가합니다.
+  const [name, setName] = useState(null); 
   const [id, setId] = useState(null);
   const url = Url
   const [isModalOpen, setIsModalOpen] = useState(false); // modal창
@@ -60,20 +61,24 @@ function Menu() {
 
   const goToLogin = () => {
     navigate('/login');
+    window.location.reload()
   };
 
   const goToSignup = () => {
     navigate('/signup');
+    window.location.reload()
   };
 
   const goToChangeinfo = () => {
     navigate('/changeinfo');
+    window.location.reload()
   };
 
 
 
   const goToSeeReservation = () => {
     navigate('/seereservation');
+    window.location.reload()
   };
 
 
@@ -87,19 +92,21 @@ function Menu() {
       {!token && <button className={styles.button} onClick={goToSignup}>회원가입</button>}
       {token && <button className={styles.button} onClick={handleLogout}>로그아웃</button>}
       {token && <button className={styles.button} onClick={goToChangeinfo}>회원정보변경</button>}
-      {token && <button className={styles.button} onClick={goToSeeReservation}>예약내역확인하기</button>}
+      {token && <button className={styles.button} onClick={goToSeeReservation}>예약내역확인</button>}
 
       {token && <button className={`${styles.button} ${styles.deleteButton}`} onClick={openModal}>회원 탈퇴</button>}
+
 
       {isModalOpen && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <p>정말로 회원 탈퇴 하시겠습니까?</p>
-            <button onClick={confirmDeleteAccount}>예</button>
-            <button onClick={closeModal}>아니오</button>
+            <button className={` ${styles.confirmButton}`} onClick={confirmDeleteAccount}>예</button>
+            <button className={` ${styles.closeButton}`} onClick={closeModal}>아니오</button>
           </div>
         </div>
       )}
+
     </div>
   );
 }

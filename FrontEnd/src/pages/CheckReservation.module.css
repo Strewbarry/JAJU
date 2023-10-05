@@ -47,26 +47,54 @@
 }
 
 
-/* modal창 */
-/* CheckReservation.module.css */
+/* 모달 오버레이 스타일 */
 .modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* 투명한 검은색 배경 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* 모달 창 스타일 */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-}
-
-.modal {
-    background-color: white;
+  }
+  
+  .modalContent {
+    position: relative;
+    background-color: #fff;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
     width: 300px;
     text-align: center;
-}
+    border: 2px solid #9c27b0; /* 보라색 테두리 */
+    box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4); /* 보라색 빛나는 그림자 효과 */
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #FF4136; /* 빨간색 'X' 아이콘 */
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  

@@ -10,11 +10,14 @@ function Modal({ show, onClose, children }) {
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modal}>
-                {children}
-                <button onClick={onClose}>닫기</button>
+                <div className={styles.modalContent}>
+                    {children}
+                    <button className={styles.closeButton} onClick={onClose}>X</button>
+                </div>
             </div>
         </div>
     );
+    
 }
 
 
@@ -85,8 +88,7 @@ function CheckReservation() {
                 <p>호출지역: {storedRegion}</p>
                 <p>예약 시간: {bookingDateTime.replace('T', ' ')}</p>
                 <p>반납 시간: {returnDateTime.replace('T', ' ')}</p>
-                <p>선택한 차량: {selectedCarId}</p>
-                <p>호출할 지역: 위도 {selectedLatitude}, 경도 {selectedLongitude}</p>
+
                 <p>예상 가격: {selectedCarFee}원</p>
                 <p>호출 위치: {selectedLocation}</p>
             </div>

@@ -78,10 +78,10 @@ function Map() {
   const [clickedLatitude, setClickedLatitude] = useState(null);
   const [clickedLongitude, setClickedLongitude] = useState(null);
   const [mapType, setMapType] = useState('normal');
-  const [modalContent, setModalContent] = useState('reserve');
+  const [modalContent, setModalContent] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  
+
 
 
   const [showModal, setShowModal] = useState(false);
@@ -94,7 +94,7 @@ function Map() {
 
   const [position, setPosition] = useState([0, 126.77313034628662]);
 
-  const [reservationId, setReservationId] = useState(null); 
+  const [reservationId, setReservationId] = useState(null);
   const [pathData, setpathData] = useState([])
   const [lineStringData, setlineStringData] = useState({
     type: "Feature",
@@ -117,10 +117,10 @@ function Map() {
   let pathDat = storedLocations ? JSON.parse(storedLocations) : [];
 
   const returnVehiclePrompt = () => {
-    setModalContent('return');
     setShowModal(true);
-    localStorage.removeItem('locations');  // Clear the 'locations' value from localStorage
-};
+    setModalContent(false);
+    localStorage.removeItem('locations');  
+  };
 
 
 
@@ -128,7 +128,7 @@ function Map() {
     try {
       setClickedLatitude(lat); // set latitude here
       setClickedLongitude(lng); // set longitude here
-      
+
       const token = localStorage.getItem('token');
       const around_location = '제주';
       const postData = { around_location, lat, lng };
@@ -178,30 +178,32 @@ function Map() {
           'authorization': token,
           'Content-Type': 'application/json'
         };
-  
-        const response = await axios.put(`${url}/reservation/return`, 
-        { reservation_id: reservationId }, { headers });
-  
+
+        const response = await axios.put(`${url}/reservation/return`,
+          { reservation_id: reservationId }, { headers });
+
         if (response.status === 200) {
           console.log("Vehicle returned successfully!");
           setReservationId(null);  // 예약이 성공적으로 반환된 후, reservationId를 초기화합니다.
         } else {
           console.error("Failed to return the vehicle");
         }
-  
+
       } else {
         console.error("No reservation ID available for return");
       }
-  
+
       setIsRented(false);
       setVehicleId(null);
       setShowModal(false); // 모달 창을 숨기는 코드 추가
-  
+      setModalContent(false); // Modal content를 예약으로 설정
+
+
     } catch (error) {
       console.error('Error while returning the vehicle:', error);
     }
   };
-  
+
 
   useEffect(() => {
 
@@ -223,7 +225,7 @@ function Map() {
     });
 
     setInterval(subscribe4, 5000)
-    
+
 
     return () => {
       ros.close();
@@ -231,13 +233,13 @@ function Map() {
   }, []);
   useEffect(() => {
     setlineStringData((current) => {
-      let newData = {...current}
+      let newData = { ...current }
       newData.geometry.coordinates = pathData
       console.log(newData)
       return newData
     })
-    
-    let example = {...lineStringData}
+
+    let example = { ...lineStringData }
     example.geometry.coordinates = pathData
     console.log(example)
     setlineStringData(example)
@@ -328,7 +330,7 @@ function Map() {
 
 
   const RenderMarkers = () => {
-    const token =  localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const handleSelectDestination = async (marker) => {
       console.log(marker.label);
       if (marker.label === '호출지') {
@@ -339,8 +341,8 @@ function Map() {
       }
       else if (marker.label === '마라탕집') {
 
-        const postdata = {vehicle_id:vehicleId, destination_name : 'school'}
-        const response = await axios.post(`${url}/vehicle/move`,postdata, { headers: { 'authorization': token } });
+        const postdata = { vehicle_id: vehicleId, destination_name: 'school' }
+        const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
         console.log(response)
       }
       // 여기에서 원하는 작업을 수행할 수 있습니다.
@@ -353,18 +355,7 @@ function Map() {
             <b>{marker.label}</b>
           </div>
           <br />
-          {isRented ?
-            // <button onClick={() => {handleSelectDestination(marker)}} className={styles.destinationButton}>목적지로 선택</button>
-            <p>.</p>
-            :
-            <button
-              className={styles.callVehicleButton}
-              onClick={() => callVehicle(marker.position[0], marker.position[1])
-                  
-              }>
-              이곳으로 호출하기
-            </button>
-          }
+
 
         </Popup>
 
@@ -386,7 +377,7 @@ function Map() {
       const token = localStorage.getItem('token');
       const postData = {
         // reservation: true,
-        lat: clickedLatitude, 
+        lat: clickedLatitude,
         lng: clickedLongitude,
         vehicle_id: vehicleId
       };
@@ -400,10 +391,10 @@ function Map() {
       if (response.status === 200) {
         console.log("Vehicle reserved successfully!");
         setIsRented(true); // 예약이 성공하면 isRented를 true로 설정
-        setModalContent('reserve'); // Modal content를 예약으로 설정
+        setModalContent(true); // Modal content를 예약으로 설정
         closeModal();
         console.log(response.data)
-        setReservationId(response.data.insertId); 
+        setReservationId(response.data.insertId);
 
         // reserveVehicle가 실행될 때마다 subscribe3와 subscribe4를 호출
         subscribe3();
@@ -419,211 +410,224 @@ function Map() {
 
 
   function subscribe3() {
-     const GPS_topic_listner = new ROSLIB.Topic({
-       ros: ros,
-       name: "/gps",
-       messageType: "morai_msgs/GPSMessage"
-     });
-   
-     GPS_topic_listner.subscribe(function (data) {
-       // Set the latitude and longitude values as state
-       setPosition([data.latitude, data.longitude]);
-   
-       // Destination latitude, longitude
-       const targetLatitude = clickedPosition ? clickedPosition.lat : null;
-       const targetLongitude = clickedPosition ? clickedPosition.lng : null;
-       // Set range
-       const range = 0.0001;
-   
-       // Check if the latitude and longitude are within the range of the destination
-       if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
-         (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
-         console.log("목적지에 도착했습니다.");
+    const GPS_topic_listner = new ROSLIB.Topic({
+      ros: ros,
+      name: "/gps",
+      messageType: "morai_msgs/GPSMessage"
+    });
+
+    GPS_topic_listner.subscribe(function (data) {
+      // Set the latitude and longitude values as state
+      setPosition([data.latitude, data.longitude]);
+
+      // Destination latitude, longitude
+      const targetLatitude = clickedPosition ? clickedPosition.lat : null;
+      const targetLongitude = clickedPosition ? clickedPosition.lng : null;
+      // Set range
+      const range = 0.0001;
+
+      // Check if the latitude and longitude are within the range of the destination
+      if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
+        (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
+        console.log("목적지에 도착했습니다.");
         //  alert("목적지에 도착했습니다."); // Display an alert
-         localStorage.setItem('locations', null); 
-       } else {
-         // console.log(data.latitude);
-         // console.log(data.longitude);
-       }
-     });
-   }
-   
- 
-   async function subscribe4() {
-     const GPS_topic_listner = new ROSLIB.Topic({
-       ros: ros,
-       name: "/global_path",
-       messageType: "nav_msgs/Path"
-     });
- 
-     GPS_topic_listner.subscribe(function (data) {
-       // 배열 초기화
-       let locations = [];
- 
-       // for문 돌려서 경로 재탐색
-       for (let i = 0; i < data.poses.length; i++) {
-         let east = data.poses[i].pose.position.x + 302459.942;
-         let north = data.poses[i].pose.position.y + 4122635.537;
- 
-         let result = utmTogps(east, north);
- 
-         // 결과를 locations 배열에 추가
-         locations.push([
-           result.longitude,
-           result.latitude
-         ]);
-       }
-       console.log(locations);  // 전체 위치 데이터를 출력
-       let exam = {...lineStringData}
-       exam.geometry.coordinates = locations
-       console.log(exam.geometry.coordinates)
-       setlineStringData(exam)
-       
-       
- 
-       setpathData(locations)
-       localStorage.setItem('locations', JSON.stringify(locations));
- 
-       // 메시지를 받은 후 즉시 구독 취소
-       GPS_topic_listner.unsubscribe();
-     });
- 
-     // console.log('제잘');
-   }
- 
-   const handleOptionSelect = async (option) => {
-     setSelectedOption(option);
-     const token = localStorage.getItem('token');
- 
-     if (option === '호출지') {
-         console.log(token);
- 
-         const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
-         console.log(response);
-     } else if (option === '마라탕집') {
- 
-         const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
-         const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
-         console.log(response);
-     } else if (option === '신라호텔') {
- 
-       const postdata = { vehicle_id: vehicleId, destination_name : 'hotel'}
-       const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
-         console.log(response);
-     }
-     else if (option === '신라호텔') {
-       const postdata = { vehicle_id : vehicleId, destination_name : 'hotel'}
-       const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
-         console.log(response);
-     }
-     // 여기에서 원하는 작업을 수행할 수 있습니다.
- };
- 
-   const toggleDropdown = () => {
-     setDropdownOpen(!isDropdownOpen);
-   };
-   
-   
-   const lineStringDat = {
-     type: "Feature",
-     properties: {},
-     geometry: {
-       type: "LineString",
-       coordinates: pathData
-     }
-   }
-   console.log(lineStringDat)
-   
-   async function stop () {
-     console.log('정지')
-     const postdata = {vehicle_id : vehicleId}
-     const token =  await localStorage.getItem('token');
-     const response = await axios.post(`${url}/vehicle/stop`,postdata, { headers: { 'authorization': token } });
-     console.log(response)
-       
-   }
- 
-   return (
-     <div>
-       <button onClick={() => subscribe()}>차 실시간 위치 확인하기</button>
-       <button onClick={() => subscribe2()}>경로 탐색</button>
- 
-       <div className={styles.row}>
-         <div className={`${styles.col} ${styles.textCenter}`}>
-           <div className={styles.col}>
-             <MapContainer center={center} zoom={ZOOM_LEVEL} className={styles.mapContainer}>
-               <div className={styles.mapButtons}>
-                 <button className={`${styles.button} ${mapType === 'normal' ? styles.buttonSelected : ''}`} onClick={() => setMapType('normal')}>일반지도</button>
-                 <button className={`${styles.button} ${mapType === 'satellite' ? styles.buttonSelected : ''}`} onClick={() => setMapType('satellite')}>위성지도</button>
-                 <div className={styles.dropdown}>
-                 <button className={styles.destinationButton} onClick={toggleDropdown}>
-                   목적지 선택하기
-                 </button>
-                 {isDropdownOpen && (
-                   <div className={styles.dropdownMenu}>
-                     <button onClick={() => handleOptionSelect('호출지')}>호출지</button>
-                     <button onClick={() => handleOptionSelect('마라탕집')}>마라탕집</button>
-                     <button onClick={() => handleOptionSelect('탕후루집')}>탕후루집</button>
-                     <button onClick={() => handleOptionSelect('신라호텔')}>신라호텔</button>
-                     <button onClick={() => handleOptionSelect('한잔어때')}>한잔어때</button>
-                     <button onClick={() => handleOptionSelect('배꼽집')}>배꼽집</button>
-                     <button onClick={() => handleOptionSelect('커피빈')}>커피빈</button>
-                   </div>
-                 )}
-               </div>
-               </div>
-               <TileLayer url={mapType === 'normal' ? osm.maptiler.url : osm2.maptiler.url} attribution={mapType === 'normal' ? osm.maptiler.attribution : osm2.maptiler.attribution} />
-               <MapEvents />
-               <Marker position={position} icon={CircleIcon} label='Start 지점[제주공항]' />
- 
-               <RenderMarkers />
-               <GeoJSON key={JSON.stringify(lineStringData.geometry.coordinates)} data={lineStringData} />
-               {isRented && (
-                 <div className={styles.returnButtonContainer}>
-                   <button onClick={returnVehiclePrompt} className={styles.returnButton}>반납하기</button>
-                   <button onClick={stop} className={styles.stopButton}>정지하기</button>
- 
-                 </div>
-               )}
- 
- 
-             </MapContainer>
- 
- 
- 
-           </div>
-         </div>
-       </div>
- 
-       {showModal && (
-         <div className={styles.modal}>
-           <div className={styles.modalContent}>
-             {modalContent === 'reserve' ? (
-               <>
-                 <h3>이 차량을 빌리시겠습니까?</h3>
-                 <p>차량 종류: {carInfo.name}</p>
-                 <p>주행가능 거리: {carInfo.fuel_left}km</p>
-                 <p>차량 번호: {carInfo.number}</p>
-                 <button className={styles.confirmButton} onClick={reserveVehicle}>예</button>
-                 <button className={styles.cancelButton} onClick={closeModal}>아니오</button>
-               </>
-             ) : (
-               <>
-                 <h3>차량을 반납하시겠습니까?</h3>
-                 <button className={styles.confirmButton} onClick={returnVehicle}>예</button>
-                 <button className={styles.cancelButton} onClick={closeModal}>아니오</button>
-               </>
-             )}
- 
-           </div>
-         </div>
-       )}
- 
- 
-     </div>
-   );
- }
- 
- export default Map;
- 
+        localStorage.setItem('locations', null);
+      } else {
+        // console.log(data.latitude);
+        // console.log(data.longitude);
+      }
+    });
+  }
+
+
+  async function subscribe4() {
+    const GPS_topic_listner = new ROSLIB.Topic({
+      ros: ros,
+      name: "/global_path",
+      messageType: "nav_msgs/Path"
+    });
+
+    GPS_topic_listner.subscribe(function (data) {
+      // 배열 초기화
+      let locations = [];
+
+      // for문 돌려서 경로 재탐색
+      for (let i = 0; i < data.poses.length; i++) {
+        let east = data.poses[i].pose.position.x + 302459.942;
+        let north = data.poses[i].pose.position.y + 4122635.537;
+
+        let result = utmTogps(east, north);
+
+        // 결과를 locations 배열에 추가
+        locations.push([
+          result.longitude,
+          result.latitude
+        ]);
+      }
+      console.log(locations);  // 전체 위치 데이터를 출력
+      let exam = { ...lineStringData }
+      exam.geometry.coordinates = locations
+      console.log(exam.geometry.coordinates)
+      setlineStringData(exam)
+
+
+
+      setpathData(locations)
+      localStorage.setItem('locations', JSON.stringify(locations));
+
+      // 메시지를 받은 후 즉시 구독 취소
+      GPS_topic_listner.unsubscribe();
+    });
+
+    // console.log('제잘');
+  }
+
+  const handleOptionSelect = async (option) => {
+    setSelectedOption(option);
+    const token = localStorage.getItem('token');
+
+    if (option === '호출지') {
+      console.log(token);
+
+      const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
+      console.log(response);
+    } else if (option === '마라탕집') {
+
+      const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
+      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+      console.log(response);
+    } else if (option === '신라호텔') {
+
+      const postdata = { vehicle_id: vehicleId, destination_name: 'hotel' }
+      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+      console.log(response);
+    }
+    else if (option === '신라호텔') {
+      const postdata = { vehicle_id: vehicleId, destination_name: 'hotel' }
+      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+      console.log(response);
+    }
+    // 여기에서 원하는 작업을 수행할 수 있습니다.
+  };
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!isDropdownOpen);
+  };
+
+
+  const lineStringDat = {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "LineString",
+      coordinates: pathData
+    }
+  }
+  console.log(lineStringDat)
+
+  async function stop() {
+    console.log('정지')
+    const postdata = { vehicle_id: vehicleId }
+    const token = await localStorage.getItem('token');
+    const response = await axios.post(`${url}/vehicle/stop`, postdata, { headers: { 'authorization': token } });
+    console.log(response)
+
+  }
+
+  return (
+    <div>
+      {/* <button onClick={() => subscribe()}>차 실시간 위치 확인하기</button>
+      <button onClick={() => subscribe2()}>경로 탐색</button> */}
+      <div className={styles.row}>
+        <div className={`${styles.col} ${styles.textCenter}`}>
+          <div className={styles.col}>
+            <MapContainer center={center} zoom={ZOOM_LEVEL} className={styles.mapContainer}>
+              <div className={styles.mapButtons}>
+                <button className={`${styles.button} ${mapType === 'normal' ? styles.buttonSelected : ''}`} onClick={() => setMapType('normal')}>일반지도</button>
+                <button className={`${styles.button} ${mapType === 'satellite' ? styles.buttonSelected : ''}`} onClick={() => setMapType('satellite')}>위성지도</button>
+                <br />
+                <br />
+                <div className={styles.dropdown}>
+                  {isRented ? (
+                    <>
+                      <button className={styles.destinationButton} onClick={toggleDropdown}>
+                        목적지 선택하기
+                      </button>
+                      {isDropdownOpen && (
+                        <div className={styles.dropdownMenu}>
+                          <button onClick={() => handleOptionSelect('호출지')}>호출지</button>
+                          <button onClick={() => handleOptionSelect('마라탕집')}>마라탕집</button>
+                          <button onClick={() => handleOptionSelect('탕후루집')}>탕후루집</button>
+                          <button onClick={() => handleOptionSelect('신라호텔')}>신라호텔</button>
+                          <button onClick={() => handleOptionSelect('한잔어때')}>한잔어때</button>
+                          <button onClick={() => handleOptionSelect('배꼽집')}>배꼽집</button>
+                          <button onClick={() => handleOptionSelect('커피빈')}>커피빈</button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <button
+                      className={styles.callVehicleButton}
+                      onClick={() => callVehicle(0, 0)}
+                    >
+                      호출하기
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <TileLayer url={mapType === 'normal' ? osm.maptiler.url : osm2.maptiler.url} attribution={mapType === 'normal' ? osm.maptiler.attribution : osm2.maptiler.attribution} />
+              <MapEvents />
+              <Marker position={position} icon={CircleIcon} label='Start 지점[제주공항]' />
+
+              <RenderMarkers />
+              <GeoJSON key={JSON.stringify(lineStringData.geometry.coordinates)} data={lineStringData} />
+              {isRented && (
+                <div className={styles.returnButtonContainer}>
+                  <button onClick={returnVehiclePrompt} className={styles.returnButton}>반납하기</button>
+                  <button onClick={stop} className={styles.stopButton}>정지하기</button>
+
+                </div>
+              )}
+
+
+            </MapContainer>
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {showModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            {modalContent ? (
+              <>
+                <h3>이 차량을 빌리시겠습니까?</h3>
+                <p>차량 종류: {carInfo.name}</p>
+                <p>주행가능 거리: {carInfo.fuel_left}km</p>
+                <p>차량 번호: {carInfo.number}</p>
+                <button className={styles.confirmButton} onClick={reserveVehicle}>예</button>
+                <button className={styles.cancelButton} onClick={closeModal}>아니오</button>
+              </>
+            ) : (
+              <>
+                <h3>차량을 반납하시겠습니까?</h3>
+                <button className={styles.confirmButton} onClick={returnVehicle}>예</button>
+                <button className={styles.cancelButton} onClick={closeModal}>아니오</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+
+
+    </div>
+  );
+}
+
+export default Map;
+
 

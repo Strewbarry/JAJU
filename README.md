@@ -156,6 +156,7 @@ Frontend
 ---
 
 - [기능명세서](./docs/기능명세서.md)
+- [ERD](./docs/image/C104_ERD.PNG)
 
 ## ✔ 프로젝트 결과물
 

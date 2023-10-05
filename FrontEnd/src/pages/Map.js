@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Url } from '../server_url';
 import axios from 'axios';
 import styles from './Map.module.css';
@@ -83,6 +83,8 @@ function Map() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [destinationCoords, setDestinationCoords] = useState(null);
+  const [arrivedMessage, setArrivedMessage] = useState(null);
+
   useEffect(() => {
     console.log("Updated destinationCoords:", destinationCoords);
 }, [destinationCoords]);
@@ -423,12 +425,15 @@ function Map() {
     });
 
     GPS_topic_listner.subscribe(function (data) {
+
+      let lastLocation = JSON.parse(localStorage.getItem('lastLocation'));
+
       // Set the latitude and longitude values as state
       setPosition([data.latitude, data.longitude]);
 
-      // Destination latitude, longitude
-      const targetLatitude = destinationCoords ? destinationCoords.lat : null;
-      const targetLongitude = destinationCoords ? destinationCoords.lng : null;
+      // 가져온 위치 데이터를 사용하여 targetLatitude와 targetLongitude에 값을 할당
+      const targetLatitude = lastLocation ? lastLocation[1] : null;
+      const targetLongitude = lastLocation ? lastLocation[0] : null;
       // 로그 출력
       console.log("Target Latitude:", targetLatitude);
       console.log("Target Longitude:", targetLongitude);
@@ -436,12 +441,20 @@ function Map() {
       // Set range
       const range = 0.0001;
 
-      // Check if the latitude and longitude are within the range of the destination
-      if (!hasArrived && (data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
+      if (!hasArrived && 
+        (data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
         (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
-        alert("목적지에 도착했습니다."); // Display an alert
-        setHasArrived(true);  // set hasArrived to true after alerting
-      }
+    
+        setHasArrived(true);  // set hasArrived to true
+    
+        // localStorage에서 'lastLocation' 값을 삭제
+        localStorage.removeItem('lastLocation');
+    
+        // Set the arrived message
+        setArrivedMessage("목적지에 도착했습니다.");
+    }
+    
+    
     });
 }
 
@@ -480,6 +493,11 @@ function Map() {
 
       setpathData(locations)
       localStorage.setItem('locations', JSON.stringify(locations));
+        // for문이 종료된 후 마지막 위치 데이터만 localStorage에 저장
+      if (locations.length > 0) {
+        let lastLocation = locations[locations.length - 1];
+        localStorage.setItem('lastLocation', JSON.stringify(lastLocation));
+      }
 
       // 메시지를 받은 후 즉시 구독 취소
       GPS_topic_listner.unsubscribe();
@@ -497,16 +515,19 @@ function Map() {
       setDestinationCoords({ lat: 37.239071349649535, lng: 126.77305532061546 });
       const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
       console.log(response);
+      setArrivedMessage(null);  // 메시지 초기화
     } else if (option === '마라탕집') {
       setDestinationCoords({ lat: 37.24000507292737, lng: 126.77429711745246 });
       const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
       const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
       console.log(response);
+      setArrivedMessage(null);  // 메시지 초기화
     } else if (option === '신라호텔') {
       setDestinationCoords({ lat: 37.24514971019341, lng: 126.77504146110552 });
       const postdata = { vehicle_id: vehicleId, destination_name: 'hotel' }
       const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
       console.log(response);
+      setArrivedMessage(null);  // 메시지 초기화
     }
 
     // 여기에서 원하는 작업을 수행할 수 있습니다.
@@ -543,6 +564,7 @@ function Map() {
       <div className={styles.row}>
         <div className={`${styles.col} ${styles.textCenter}`}>
           <div className={styles.col}>
+          {arrivedMessage && <p>{arrivedMessage}</p>}
             <MapContainer center={center} zoom={ZOOM_LEVEL} className={styles.mapContainer}>
               <div className={styles.mapButtons}>
                 <button className={`${styles.button} ${mapType === 'normal' ? styles.buttonSelected : ''}`} onClick={() => setMapType('normal')}>일반지도</button>

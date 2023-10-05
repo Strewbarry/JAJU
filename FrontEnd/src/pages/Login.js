@@ -89,10 +89,10 @@ function Login() {
       </form>
 
       {isModalOpen && (
-        <div style={modalStyles}>
-          <div style={modalContentStyles}>
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
             <p>{modalMessage}</p>
-            <button onClick={closeModal}>Close</button>
+            <button className={styles.button} onClick={closeModal}>Close</button>
           </div>
         </div>
       )}

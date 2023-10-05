@@ -13,6 +13,9 @@ import YangImage10 from '../assets/Yangyang10.png'
 import { useNavigate } from 'react-router-dom';
 
 function Yangyang() {
+  const handleGoBack = () => {
+    navigate("/");
+  };
   const dummyData = [
     { id: 1, title: "쏠티 캐빈", image: YangImage },
     { id: 2, title: "서피비치", image: YangImage2 },
@@ -28,13 +31,14 @@ function Yangyang() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ marginBottom: '70px' }}>
-      <p>양양</p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+    <div className={styles.pageContainer}>
+      <p className={styles.goback} onClick={handleGoBack}>뒤로가기</p>
+      <p className={styles.pageTitle}>양양</p>
+      <div className={styles.itemList}>
         {dummyData.map(item => (
-          <div key={item.id} style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', width: '150px' }}>
-            <img src={item.image} alt={item.title} style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
-            <p style={{ textAlign: 'center', margin: '10px 0 0 0' }}>{item.title}</p>
+          <div key={item.id} className={styles.item}>
+            <img src={item.image} alt={item.title} className={styles.itemImage} />
+            <p className={styles.itemTitle}>{item.title}</p>
           </div>
         ))}
       </div>

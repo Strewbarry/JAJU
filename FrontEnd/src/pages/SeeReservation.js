@@ -86,23 +86,20 @@ function SeeReservation() {
     
     return (
         <div className={styles.container}>
-            <p>예약내역확인</p>
+            
             {reservations.length > 0 ? (
                 reservations.map((reservation, index) => (
                     <div key={index} className={styles.reservationItem}>
-                        {/* <p>아이디: {reservation.id}</p> */}
-                        <p>위도: {reservation.lat}</p>
-                        <p>경도: {reservation.lng}</p>
+
+
                         <p>예약 시간: {new Date(reservation.reservation_time).toLocaleString()}</p>
                         <p>반납 시간: {new Date(reservation.return_time).toLocaleString()}</p>
-                        {/* <p>사용자 ID: {reservation.user_id}</p> */}
-                        {/* <p>차량 ID: {reservation.vehicle_id}</p> */}
+
                         <p>예상 가격:{reservation.price}원</p>
                         <p>차량 번호: {reservation.car_info[0].car_number}</p>
-                        <p>차량종류: {reservation.car_info_id}</p>
-                        <p>호출지역 : {reservation.region}</p>
-                        <p>하드코딩하면 장소어딘지 :</p>
-    
+                        {/* <p>차량종류: {reservation.car_info_id}</p> */}
+                        <p>호출지역 : {reservation.region}</p> 
+                        <p>호출장소 : {reservation.location}</p>   
                         <button onClick={() => handleCancelReservation(reservation.id)} className={styles.cancelButton}>예약 취소하기</button>
                     </div>
                 ))

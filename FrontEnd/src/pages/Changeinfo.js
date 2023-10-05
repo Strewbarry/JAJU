@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import {Url} from '../server_url';
+import styles from './Changeinfo.module.css';
 
 function Changeinfo() {
   const [name, setName] = useState('');
@@ -52,30 +53,32 @@ function Changeinfo() {
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <p>회원정보 변경</p>
       {message && <p>{message}</p>}
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name</label>
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Name</label>
           <input
             type="text"
+            className={styles.inputField}
             placeholder="변경할 이름을 입력하세요"
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div>
-          <label>Phone Number</label>
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Phone Number</label>
           <input
             type="tel"
+            className={styles.inputField}
             placeholder="변경할 전화번호를 입력하세요"
             onChange={(e) => setPhonenumber(e.target.value)}
           />
         </div>
-        <button type="submit">변경하기</button>
+        <button type="submit" className={styles.submitButton}>변경하기</button>
       </form>
     </div>
-  );
+);
 }
 
 export default Changeinfo;

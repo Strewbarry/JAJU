@@ -80,9 +80,8 @@ function Map() {
   const [modalContent, setModalContent] = useState('reserve');
   const [selectedOption, setSelectedOption] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  
-
-
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   const [carInfo, setCarInfo] = useState({ name: '', number: '', fuel_left: '' });
@@ -94,6 +93,15 @@ function Map() {
   const [position, setPosition] = useState([0, 126.77313034628662]);
 
   const [reservationId, setReservationId] = useState(null); 
+  const [lineStringData, setLineStringData] = useState({
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "LineString",
+      coordinates: []
+    }
+  });
+
 
   const utmProjection = "+proj=utm +zone=52";
   const wgs84Projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
@@ -104,8 +112,8 @@ function Map() {
     url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
   });
 
-  let storedLocations = localStorage.getItem('locations');
-  let pathData = storedLocations ? JSON.parse(storedLocations) : [];
+
+  const pathData = JSON.parse(localStorage.getItem('locations')) || [];
 
   const returnVehiclePrompt = () => {
     setModalContent('return');
@@ -232,8 +240,8 @@ function Map() {
       setPosition([data.latitude, data.longitude]);
 
       // 목적지 위도, 경도
-      const targetLatitude = clickedPosition ? clickedPosition.lat : null;
-      const targetLongitude = clickedPosition ? clickedPosition.lng : null;
+      const targetLatitude = latitude;
+      const targetLongitude = longitude;
 
       // 범위 설정
       const range = 0.0001;
@@ -402,10 +410,10 @@ function Map() {
       setPosition([data.latitude, data.longitude]);
   
       // Destination latitude, longitude
-      const targetLatitude = clickedPosition ? clickedPosition.lat : null;
-      const targetLongitude = clickedPosition ? clickedPosition.lng : null;
+      const targetLatitude = latitude
+      const targetLongitude = longitude
       // Set range
-      const range = 0.0001;
+      const range = 0.0002;
   
       // Check if the latitude and longitude are within the range of the destination
       if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
@@ -420,14 +428,16 @@ function Map() {
     });
   }
   
+  let intervalId = null;
+function subscribe4() {
+  const GPS_topic_listner = new ROSLIB.Topic({
+    ros: ros,
+    name: "/global_path",
+    messageType: "nav_msgs/Path"
+  });
 
-  function subscribe4() {
-    const GPS_topic_listner = new ROSLIB.Topic({
-      ros: ros,
-      name: "/global_path",
-      messageType: "nav_msgs/Path"
-    });
-
+  // This function handles the subscription and processing of messages
+  function handleSubscription() {
     GPS_topic_listner.subscribe(function (data) {
       // 배열 초기화
       let locations = [];
@@ -448,12 +458,15 @@ function Map() {
       console.log(locations);  // 전체 위치 데이터를 출력
       localStorage.setItem('locations', JSON.stringify(locations));
 
-      // 메시지를 받은 후 즉시 구독 취소
-      GPS_topic_listner.unsubscribe();
+      // 메시지를 받은 후 구독 취소하지 않음 (Keep the subscription active)
+      // GPS_topic_listner.unsubscribe();
     });
-
-    // console.log('제잘');
   }
+  
+
+  // Call the handleSubscription function every 5 seconds
+  intervalId = setInterval(handleSubscription, 5000);
+}
 
   const handleOptionSelect = async (option) => {
     setSelectedOption(option);
@@ -461,18 +474,21 @@ function Map() {
 
     if (option === '호출지') {
         console.log(token);
-
+        setLatitude(37.239071349649535);
+        setLongitude(126.77305532061546);
         const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
         console.log(response);
     } else if (option === '마라탕집') {
-
+        setLatitude(37.24000507292737);
+        setLongitude(126.77429711745246);
         const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
         const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
         console.log(response);
     } else if (option === '신라호텔') {
-
-      const postdata = { vehicle_id: vehicleId, destination_name : 'hotel'}
-      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+        setLatitude(37.24514971019341);
+        setLongitude(126.77504146110552);
+        const postdata = { vehicle_id: vehicleId, destination_name : 'hotel'}
+        const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
         console.log(response);
     }
     else if (option === '신라호텔') {
@@ -488,14 +504,7 @@ function Map() {
   };
   
   
-  const lineStringData = {
-    type: "Feature",
-    properties: {},
-    geometry: {
-      type: "LineString",
-      coordinates: pathData
-    }
-  };
+
 
   async function stop () {
     console.log('정지')

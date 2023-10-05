@@ -55,14 +55,14 @@ const tanghuluIcon = createIcon(tanghuluImage)
 const maraIcon = createIcon(maraImage)
 const parkingIcon = createIcon(parkingImage)
 const markers = [
-  { position: [37.245428193272716, 126.7750329522217], icon: hotelIcon, label: '스탠포드호텔' },
+  { position: [37.24514971019341, 126.77504146110552], icon: hotelIcon, label: '신라호텔' },
 
   { position: [37.24068299201391, 126.77130810123954], icon: restaurantIcon, label: '한국식 소고기 전문 음식점 [ 배꼽집]' },
   { position: [37.23833240877633, 126.77201420033694], icon: coffeeIcon, label: '커피빈' },
   { position: [37.24444434990808, 126.77585464595262], icon: swimIcon, label: '수영장' },
   { position: [37.23576639296262, 126.77286038119048], icon: beerIcon, label: '한잔어때' },
 
-  { position: [37.24329834268778, 126.77522987905812], icon: barrierIcon, label: '공사중 막혀서 돌아감' }, //
+  { position: [37.241963098645286, 126.77443742793005], icon: barrierIcon, label: '공사중 막혀서 돌아감' }, //
   // { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
   { position: [37.23854529782744, 126.77299597702779], icon: parkingIcon, label: '주차장' }, //  
   { position: [37.239071349649535, 126.77305532061546], icon: defaultIcon, label: '호출지' }, //
@@ -80,6 +80,7 @@ function Map() {
   const [modalContent, setModalContent] = useState('reserve');
   const [selectedOption, setSelectedOption] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  
 
 
   const [showModal, setShowModal] = useState(false);
@@ -305,11 +306,13 @@ function Map() {
     const handleSelectDestination = async (marker) => {
       console.log(marker.label);
       if (marker.label === '호출지') {
+
         console.log(token)
         const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
         console.log(response)
       }
       else if (marker.label === '마라탕집') {
+
         const postdata = {vehicle_id:vehicleId, destination_name : 'school'}
         const response = await axios.post(`${url}/vehicle/move`,postdata, { headers: { 'authorization': token } });
         console.log(response)
@@ -393,27 +396,30 @@ function Map() {
       name: "/gps",
       messageType: "morai_msgs/GPSMessage"
     });
-
+  
     GPS_topic_listner.subscribe(function (data) {
-      // 위도와 경도 값을 상태로 설정
+      // Set the latitude and longitude values as state
       setPosition([data.latitude, data.longitude]);
-
-      // 목적지 위도, 경도
+  
+      // Destination latitude, longitude
       const targetLatitude = clickedPosition ? clickedPosition.lat : null;
       const targetLongitude = clickedPosition ? clickedPosition.lng : null;
-      // 범위 설정
+      // Set range
       const range = 0.0001;
-
-      // 위도와 경도가 목적지의 범위 안에 있는지 확인
+  
+      // Check if the latitude and longitude are within the range of the destination
       if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
         (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
         console.log("목적지에 도착했습니다.");
+        alert("목적지에 도착했습니다."); // Display an alert
+        localStorage.setItem('locations', null); 
       } else {
         // console.log(data.latitude);
         // console.log(data.longitude);
       }
     });
   }
+  
 
   function subscribe4() {
     const GPS_topic_listner = new ROSLIB.Topic({
@@ -455,11 +461,18 @@ function Map() {
 
     if (option === '호출지') {
         console.log(token);
+
         const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
         console.log(response);
     } else if (option === '마라탕집') {
+
         const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
         const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+        console.log(response);
+    } else if (option === '신라호텔') {
+
+      const postdata = { vehicle_id: vehicleId, destination_name : 'hotel'}
+      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
         console.log(response);
     }
     else if (option === '신라호텔') {
@@ -514,6 +527,7 @@ function Map() {
                     <button onClick={() => handleOptionSelect('호출지')}>호출지</button>
                     <button onClick={() => handleOptionSelect('마라탕집')}>마라탕집</button>
                     <button onClick={() => handleOptionSelect('탕후루집')}>탕후루집</button>
+                    <button onClick={() => handleOptionSelect('신라호텔')}>신라호텔</button>
                     <button onClick={() => handleOptionSelect('한잔어때')}>한잔어때</button>
                     <button onClick={() => handleOptionSelect('배꼽집')}>배꼽집</button>
                     <button onClick={() => handleOptionSelect('커피빈')}>커피빈</button>

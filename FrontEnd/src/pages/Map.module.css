@@ -206,3 +206,10 @@
   cursor: pointer; /* 마우스 커서를 손 모양으로 */
   font-weight: bold; /* 글씨 굵게 */
 }
+
+/* styles.module.css */
+.purpleText {
+  color: purple;
+  transition: color 1s ease-in-out;
+  font-weight: bold; /* 글씨체를 굵게 설정 */
+}

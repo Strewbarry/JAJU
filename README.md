@@ -155,7 +155,7 @@ Frontend
 
 ---
 
-- [기능명세서](./docs/기능명세서.md)
+- [기능명세서](./docs/FunctionalSpecification.md)
 - [ERD](./docs/ERD.md)
 
 ## ✔ 프로젝트 결과물

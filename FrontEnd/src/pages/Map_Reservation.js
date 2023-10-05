@@ -105,9 +105,10 @@ function UpdateCenter({ center }) {
 const RenderMarkers = () => {
   const navigate = useNavigate();
 
-  const handleButtonClick = (lat, lng) => {
+  const handleButtonClick = (lat, lng, label) => {
     localStorage.setItem('selectedLatitude', lat); // 위도 저장
     localStorage.setItem('selectedLongitude', lng); // 경도 저장
+    localStorage.setItem('selectedLocation', label); // marker.label 저장
     callVehicle(lat, lng); // 기존에 있던 호출 함수
     navigate('/checkreservation'); // navigate 함수를 사용하여 /checkreservation로 이동
   }
@@ -117,7 +118,7 @@ const RenderMarkers = () => {
       <Popup>
         <b>{marker.label}</b>
         <br/>
-        <button className={styles.callButton} onClick={() => handleButtonClick(marker.position[0], marker.position[1])}>
+        <button className={styles.callButton} onClick={() => handleButtonClick(marker.position[0], marker.position[1],marker.label)}>
           이곳으로 호출하기
         </button>
       </Popup>

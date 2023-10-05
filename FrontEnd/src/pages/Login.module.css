@@ -50,8 +50,19 @@
   border-radius: 5px;
   color: #fff;
   font-size: 16px;
+  margin: 10px auto; /* Top and bottom margin of 10px, and auto for left and right to center the button */
+  display: block; /* Make the button a block element so it respects the margin settings */
 }
 
-.loginForm button:hover {
-  background-color: #660066; /* 버튼 호버 시 보라색 계열의 어두운 색으로 변경 */
+
+
+/* Login.module.css */
+
+.inputField input {
+  width: 80%; /* Adjust this value to your liking */
+  padding: 10px; /* Add some padding for better appearance */
+  border-radius: 5px; /* Round the corners for a softer look */
+  border: 1px solid rgb(227, 110, 234); /* A subtle border */
 }
+
+/* Add any other styles you'd like for the input fields or other elements here */

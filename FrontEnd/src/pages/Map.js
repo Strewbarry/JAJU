@@ -564,7 +564,7 @@ function Map() {
       <div className={styles.row}>
         <div className={`${styles.col} ${styles.textCenter}`}>
           <div className={styles.col}>
-          {arrivedMessage && <p>{arrivedMessage}</p>}
+          {arrivedMessage && <p className={styles.purpleText}>{arrivedMessage}</p>}
             <MapContainer center={center} zoom={ZOOM_LEVEL} className={styles.mapContainer}>
               <div className={styles.mapButtons}>
                 <button className={`${styles.button} ${mapType === 'normal' ? styles.buttonSelected : ''}`} onClick={() => setMapType('normal')}>일반지도</button>

@@ -212,6 +212,7 @@ function Map() {
       console.log('Connection to ROS Bridge closed');
     });
 
+    
 
     return () => {
       ros.close();
@@ -459,6 +460,11 @@ function Map() {
     } else if (option === '마라탕집') {
         const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
         const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+        console.log(response);
+    }
+    else if (option === '신라호텔') {
+      const postdata = { vehicle_id : vehicleId, destination_name : 'hotel'}
+      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
         console.log(response);
     }
     // 여기에서 원하는 작업을 수행할 수 있습니다.

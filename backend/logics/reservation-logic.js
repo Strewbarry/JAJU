@@ -1,5 +1,6 @@
 const connection = require("../utils/database.js")
-
+// 레디스 값 변경 로직 가져오기
+const { setValue } = require("../utils/redis-logic.js")
 // 예약하기 함수
 exports.make = async (req, res) => {
     // 토큰으로 부터 유저 정보와 id 추출
@@ -91,6 +92,8 @@ exports.return = async (req, res) => {
     //     })
     // })
     // 반납 시간을 다시 현재 시간으로 바꾸고 데이터베이스 값 바꿔주기, 이용 완료 필드 1로 바꿔주기
+    setValue(0,3)
+
     const return_time = new Date()
     const sql2 = 'UPDATE reservation SET `return_time`=?, `completed` = ? WHERE (`id` = ?);'
     connection.query(sql2, [return_time, 1, req.body.reservation_id], function(error, results, fields) {

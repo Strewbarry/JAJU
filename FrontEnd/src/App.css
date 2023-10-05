@@ -34,7 +34,7 @@ body {
 /* 첫 번째 버튼 스타일 */
 .map-buttons button:first-child {
   position: absolute; /* 절대 위치 지정 */
-  top: 28%; /* 버튼을 화면의 중앙에 위치시킴 */
+  top: 23%; /* 버튼을 화면의 중앙에 위치시킴 */
   left: 50%; /* 버튼을 화면의 중앙에 위치시킴 */
   transform: translate(-50%, -50%); /* 버튼의 중앙을 기준으로 화면의 중앙에 위치시킴 */
 
@@ -54,7 +54,7 @@ body {
 .map-buttons button:nth-child(3) {
   width: 44%; /* 버튼 가로 길이를 반으로 설정 (간격 때문에 약간 줄임) */
   position: absolute; /* 절대 위치 지정 */
-  top: 40%; /* 첫 번째 버튼 아래에 위치 */
+  top: 33%; /* 첫 번째 버튼 아래에 위치 */
   padding-left: 50px; /* 오른쪽 공백 추가 */
 }
 
@@ -79,7 +79,7 @@ body {
 @import "~slick-carousel/slick/slick.css"; 
 @import "~slick-carousel/slick/slick-theme.css";
 .RecommendedSpot {
-  margin-top: 220px; /* 혹은 원하는 값으로 조절하세요 */
+  margin-top: 65%; /* 혹은 원하는 값으로 조절하세요 */
   padding: 0 15px; /* 좌우에 20px의 패딩 추가 */
 }
 

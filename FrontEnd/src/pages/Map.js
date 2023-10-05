@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Url } from '../server_url';
 import axios from 'axios';
 import styles from './Map.module.css';
@@ -17,12 +17,13 @@ import restaurantImage from '../assets/restaurant.png';
 import swimImage from '../assets/swimmer.png';
 import beerImage from '../assets/beer.png';
 import childrenImage from '../assets/children.png';
-import airportImage from '../assets/Airport.png';
+import stationImage from '../assets/station.png';
 import barrierImage from '../assets/barrier.png';
 import tanghuluImage from '../assets/tanghulu.png';
 import CircleImage from '../assets/Circle.png'
 import maraImage from '../assets/mara.png'
 import parkingImage from '../assets/parking.png'
+
 
 import ROSLIB from 'roslib';
 import proj4 from 'proj4';
@@ -50,7 +51,7 @@ const swimIcon = createIcon(swimImage);
 const beerIcon = createIcon(beerImage);
 const childrenIcon = createIcon(childrenImage)
 const barrierIcon = createIcon(barrierImage)
-const airportIcon = createIcon2(airportImage)
+const stationIcon = createIcon(stationImage)
 const CircleIcon = createIcon(CircleImage)
 const tanghuluIcon = createIcon(tanghuluImage)
 const maraIcon = createIcon(maraImage)
@@ -66,7 +67,7 @@ const markers = [
   { position: [37.241963098645286, 126.77443742793005], icon: barrierIcon, label: '공사중 막혀서 돌아감' }, //
   // { position: [37.23864139722333, 126.77278808039286], icon: defaultIcon, label: '한바퀴돌아서 도착' }, //  
   { position: [37.23854529782744, 126.77299597702779], icon: parkingIcon, label: '주차장' }, //  
-  { position: [37.239071349649535, 126.77305532061546], icon: defaultIcon, label: '호출지' }, //
+  { position: [37.239071349649535, 126.77305532061546], icon: stationIcon, label: '호출지' }, //
   { position: [37.24000507292737, 126.77429711745246], icon: maraIcon, label: '마라탕집' }, //
   { position: [37.2430196110599, 126.77451974507942], icon: tanghuluIcon, label: '탕후루집' }, //
 
@@ -81,6 +82,12 @@ function Map() {
   const [modalContent, setModalContent] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [destinationCoords, setDestinationCoords] = useState(null);
+  const [arrivedMessage, setArrivedMessage] = useState(null);
+
+  useEffect(() => {
+    console.log("Updated destinationCoords:", destinationCoords);
+}, [destinationCoords]);
 
 
 
@@ -96,6 +103,7 @@ function Map() {
 
   const [reservationId, setReservationId] = useState(null);
   const [pathData, setpathData] = useState([])
+  const [hasArrived, setHasArrived] = useState(false);
   const [lineStringData, setlineStringData] = useState({
     type: "Feature",
     properties: {},
@@ -206,7 +214,7 @@ function Map() {
 
 
   useEffect(() => {
-
+    console.log("Updated destinationCoords:", destinationCoords);
     ros = new ROSLIB.Ros({
       url: 'ws://13.124.128.202:9091', // ROS Bridge WebSocket URL
     });
@@ -417,27 +425,38 @@ function Map() {
     });
 
     GPS_topic_listner.subscribe(function (data) {
+
+      let lastLocation = JSON.parse(localStorage.getItem('lastLocation'));
+
       // Set the latitude and longitude values as state
       setPosition([data.latitude, data.longitude]);
 
-      // Destination latitude, longitude
-      const targetLatitude = clickedPosition ? clickedPosition.lat : null;
-      const targetLongitude = clickedPosition ? clickedPosition.lng : null;
+      // 가져온 위치 데이터를 사용하여 targetLatitude와 targetLongitude에 값을 할당
+      const targetLatitude = lastLocation ? lastLocation[1] : null;
+      const targetLongitude = lastLocation ? lastLocation[0] : null;
+      // 로그 출력
+      console.log("Target Latitude:", targetLatitude);
+      console.log("Target Longitude:", targetLongitude);
+
       // Set range
       const range = 0.0001;
 
-      // Check if the latitude and longitude are within the range of the destination
-      if ((data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
+      if (!hasArrived && 
+        (data.latitude >= targetLatitude - range && data.latitude <= targetLatitude + range) &&
         (data.longitude >= targetLongitude - range && data.longitude <= targetLongitude + range)) {
-        console.log("목적지에 도착했습니다.");
-        //  alert("목적지에 도착했습니다."); // Display an alert
-        localStorage.setItem('locations', null);
-      } else {
-        // console.log(data.latitude);
-        // console.log(data.longitude);
-      }
+    
+        setHasArrived(true);  // set hasArrived to true
+    
+        // localStorage에서 'lastLocation' 값을 삭제
+        localStorage.removeItem('lastLocation');
+    
+        // Set the arrived message
+        setArrivedMessage("목적지에 도착했습니다.");
+    }
+    
+    
     });
-  }
+}
 
 
   async function subscribe4() {
@@ -464,16 +483,21 @@ function Map() {
           result.latitude
         ]);
       }
-      console.log(locations);  // 전체 위치 데이터를 출력
+      // console.log(locations);  // 전체 위치 데이터를 출력
       let exam = { ...lineStringData }
       exam.geometry.coordinates = locations
-      console.log(exam.geometry.coordinates)
+      // console.log(exam.geometry.coordinates)
       setlineStringData(exam)
 
 
 
       setpathData(locations)
       localStorage.setItem('locations', JSON.stringify(locations));
+        // for문이 종료된 후 마지막 위치 데이터만 localStorage에 저장
+      if (locations.length > 0) {
+        let lastLocation = locations[locations.length - 1];
+        localStorage.setItem('lastLocation', JSON.stringify(lastLocation));
+      }
 
       // 메시지를 받은 후 즉시 구독 취소
       GPS_topic_listner.unsubscribe();
@@ -488,25 +512,24 @@ function Map() {
 
     if (option === '호출지') {
       console.log(token);
-
+      setDestinationCoords({ lat: 37.239071349649535, lng: 126.77305532061546 });
       const response = await axios.get(`${url}/vehicle/call`, { headers: { 'authorization': token } });
       console.log(response);
+      setArrivedMessage(null);  // 메시지 초기화
     } else if (option === '마라탕집') {
-
+      setDestinationCoords({ lat: 37.24000507292737, lng: 126.77429711745246 });
       const postdata = { vehicle_id: vehicleId, destination_name: 'school' };
       const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
       console.log(response);
+      setArrivedMessage(null);  // 메시지 초기화
     } else if (option === '신라호텔') {
+      setDestinationCoords({ lat: 37.24514971019341, lng: 126.77504146110552 });
+      const postdata = { vehicle_id: vehicleId, destination_name: 'hotel' }
+      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
+      console.log(response);
+      setArrivedMessage(null);  // 메시지 초기화
+    }
 
-      const postdata = { vehicle_id: vehicleId, destination_name: 'hotel' }
-      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
-      console.log(response);
-    }
-    else if (option === '신라호텔') {
-      const postdata = { vehicle_id: vehicleId, destination_name: 'hotel' }
-      const response = await axios.post(`${url}/vehicle/move`, postdata, { headers: { 'authorization': token } });
-      console.log(response);
-    }
     // 여기에서 원하는 작업을 수행할 수 있습니다.
   };
 
@@ -541,6 +564,7 @@ function Map() {
       <div className={styles.row}>
         <div className={`${styles.col} ${styles.textCenter}`}>
           <div className={styles.col}>
+          {arrivedMessage && <p>{arrivedMessage}</p>}
             <MapContainer center={center} zoom={ZOOM_LEVEL} className={styles.mapContainer}>
               <div className={styles.mapButtons}>
                 <button className={`${styles.button} ${mapType === 'normal' ? styles.buttonSelected : ''}`} onClick={() => setMapType('normal')}>일반지도</button>

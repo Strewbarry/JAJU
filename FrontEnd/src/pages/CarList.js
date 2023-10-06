@@ -48,7 +48,7 @@ return (
                     alt={allCars[availableCar.car_info_id - 1].name} 
                     className={styles.carImage} 
                 />
-                <p>~인승 차량</p>
+
                 <div>{availableCar.fuel_left}km 주행 가능</div> {/* 이미지 아래로 이동 */}
                 <button 
                     onClick={() => handleCarSelection(availableCar)} 

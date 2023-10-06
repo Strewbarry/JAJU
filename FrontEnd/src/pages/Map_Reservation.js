@@ -43,13 +43,13 @@ const beerIcon = createIcon(beerImage);
 
 const markers = [
   // 상암
-  { position: [37.58200, 126.8889], icon: defaultIcon, label: 'Start 지점' },
+  { position: [37.58200, 126.8889], icon: beerIcon, label: '인쌩맥주' },
   { position: [37.582486, 126.886834], icon: hotelIcon, label: '스탠포드호텔' },
   { position: [37.581255, 126.890845], icon: MBCIcon, label: 'MBC 방송국' },
   { position: [37.582278, 126.887739], icon: coffeeIcon, label: '커피빈' },
   { position: [37.583062, 126.887092], icon: samsungIcon, label: '삼성SDS IT센터' },
   { position: [37.581406, 126.88789], icon: restaurantIcon, label: '한국식 소고기 전문 음식점 [ 배꼽집]' },
-  { position: [37.582814591, 126.888950294], icon: stationIcon, label: '기차역' },
+  { position: [37.582814591, 126.888950294], icon: stationIcon, label: '역삼역' },
   { position: [37.245428193272716, 126.7750329522217], icon: hotelIcon, label: '스탠포드호텔' },
 
   // K-city
@@ -109,7 +109,7 @@ const RenderMarkers = () => {
     localStorage.setItem('selectedLatitude', lat); // 위도 저장
     localStorage.setItem('selectedLongitude', lng); // 경도 저장
     localStorage.setItem('selectedLocation', label); // marker.label 저장
-    callVehicle(lat, lng); // 기존에 있던 호출 함수
+    callVehicle(lat, lng, label); // 기존에 있던 호출 함수
     navigate('/checkreservation'); // navigate 함수를 사용하여 /checkreservation로 이동
   }
 

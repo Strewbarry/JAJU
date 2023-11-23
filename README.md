@@ -155,14 +155,14 @@ Frontend
 
 ---
 
-- [기능명세서](./Docs/FunctionalSpecification.md)
-- [ERD](./Docs/ERD.md)
+- [기능명세서](./exec/FunctionalSpecification.md)
+- [ERD](./exec/ERD.md)
 
 ## ✔ 프로젝트 결과물
 
-- [포팅메뉴얼](./Docs/C104_포팅_메뉴얼.docx)
-- [중간발표자료](./Docs/PPT/자주여행_중간발표.pptx)
-- [최종발표자료](./Docs/PPT/자주여행_최종발표.pptx)
+- [포팅메뉴얼](./exec/C104_포팅_메뉴얼.docx)
+- [중간발표자료](./exec/PPT/자주여행_중간발표.pptx)
+- [최종발표자료](./exec/PPT/자주여행_최종발표.pptx)
 
 ## 🚓 서비스 화면
 

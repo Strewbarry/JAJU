@@ -1,0 +1,1 @@
+/home/c104/catkin_ws/devel/.private/ssafy_2/lib/pkgconfig/ssafy_2.pc

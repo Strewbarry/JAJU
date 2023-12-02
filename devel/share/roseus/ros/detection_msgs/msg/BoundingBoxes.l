@@ -1,0 +1,1 @@
+/home/c104/catkin_ws/devel/.private/detection_msgs/share/roseus/ros/detection_msgs/msg/BoundingBoxes.l

@@ -1,0 +1,1 @@
+/home/c104/catkin_ws/devel/.private/morai_msgs/share/roseus/ros/morai_msgs/msg/MoraiSrvResponse.l

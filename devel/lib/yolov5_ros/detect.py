@@ -1,0 +1,1 @@
+/home/c104/catkin_ws/devel/.private/yolov5_ros/lib/yolov5_ros/detect.py

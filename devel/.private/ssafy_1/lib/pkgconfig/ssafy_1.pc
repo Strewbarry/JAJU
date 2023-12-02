@@ -1,0 +1,8 @@
+prefix=/home/c104/catkin_ws/devel/.private/ssafy_1
+
+Name: ssafy_1
+Description: Description of ssafy_1
+Version: 0.0.0
+Cflags: -I/home/c104/catkin_ws/devel/.private/ssafy_1/include
+Libs: -L${prefix}/lib 
+Requires: rospy std_msgs message_runtime

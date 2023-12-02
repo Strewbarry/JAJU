@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="ssafy_3" type="image_parser_front.py" name="image_parser_front"/>
+    <node pkg="ssafy_3" type="image_parser_back.py" name="image_parser_back"/>
+    <node pkg="ssafy_3" type="image_parser_left.py" name="image_parser_left"/>
+    <node pkg="ssafy_3" type="image_parser_right.py" name="image_parser_right"/>
+</launch>

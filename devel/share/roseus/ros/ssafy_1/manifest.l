@@ -1,0 +1,1 @@
+/home/c104/catkin_ws/devel/.private/ssafy_1/share/roseus/ros/ssafy_1/manifest.l

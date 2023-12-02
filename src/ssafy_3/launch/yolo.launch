@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="ssafy_3" type="image_parser.py" name="image_parser"/>
+</launch>
